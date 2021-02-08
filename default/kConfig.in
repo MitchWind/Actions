@@ -1,0 +1,2 @@
+config KERNEL_BINFMT_MISC
+	default n

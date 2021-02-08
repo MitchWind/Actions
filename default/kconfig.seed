@@ -1,0 +1,2 @@
+#开启内核binfmt_misc
+CONFIG_KERNEL_BINFMT_MISC=y
