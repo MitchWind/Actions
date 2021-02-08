@@ -65,13 +65,16 @@ jobs:
    needs: verify
    if: needs.verify.outputs.isopenwrt == 'true'
    outputs:
-    isx86config: ${{ steps.isx86.outputs.files_exists }}
+    isx86config: ${{ steps.isx86.outputs.isconfig }}
    steps:
      - name: Verify X86 Files
        id: isx86       
-       uses: andstor/file-existence-action@v1
-       with:
-        files: "openwrt/X86,openwrt/X86/feeds.conf.default,openwrt/X86/config.seed"
+       run: |
+        if ( [ -d openwrt/X86/ ] && [ -f openwrt/X86/config.seed ] && [ -f openwrt/X86/feeds.conf.default ] ) ;then
+          echo "::set-output name=isconfig::true"
+        else
+          echo "::set-output name=isconfig::false"
+        fi
   Lienol :
    runs-on: ubuntu-latest
    name: Verify Lienol Config   
