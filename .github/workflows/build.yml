@@ -1,6 +1,9 @@
 name: Build
 
 on:
+ push:
+    branches:
+      - main
  workflow_dispatch:
     inputs:
       ssh:
@@ -39,8 +42,8 @@ jobs:
    - name: Verify OpenWrt
      id: isopenwrt
      run: |
-      (test -d openwrt && echo "isfile=true" >> $GITHUB_ENV ) || echo "isfile=false" >> $GITHUB_ENV
-      (test -d openwrt/X86 && echo "isfile=true" >> $GITHUB_ENV ) || echo "isfile=false" >> $GITHUB_ENV
+      '(test -d openwrt && echo "isfile=true" >> $GITHUB_ENV ) || echo "isfile=false" >> $GITHUB_ENV'
+      '(test -d openwrt/X86 && echo "isfile=true" >> $GITHUB_ENV ) || echo "isfile=false" >> $GITHUB_ENV'
   OpenWrt :
    runs-on: ubuntu-latest
    name: OpenWrt Config   
