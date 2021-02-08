@@ -70,10 +70,10 @@ jobs:
      - name: Verify X86 Files
        id: isx86       
        run: |
-        if ( [ -d openwrt/X86/ ] && [ -f openwrt/X86/config.seed ] && [ -f openwrt/X86/feeds.conf.default ] ) ;then
-          echo "::set-output name=isconfig::true"
+        if ( [ -d openwrt/X86 ] && [ -f openwrt/X86/config.seed ] && [ -f openwrt/X86/feeds.conf.default ] ) ;then
+          echo "11"
         else
-          echo "::set-output name=isconfig::false"
+          echo "222"
         fi
   Lienol :
    runs-on: ubuntu-latest
