@@ -28,6 +28,7 @@ jobs:
    steps:
    - name: Checkout
      uses: actions/checkout@main
+     
    - name: Start SSH via tmate
      uses: P3TERX/ssh2actions@main
      if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
@@ -35,8 +36,28 @@ jobs:
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
       
-   - name: Verify X86
+   - name: Verify OpenWrt
+     id: isopenwrt
      run: |
-      df -hT $PWD
+      if [ ! -d "openwrt" ];then
+          echo "::set-output name=isfile::true"
+      fi
+
+      if [ ! -d "X86" ];then
+          echo "::set-output name=isx86::true"
+      fi
+  OpenWrt :
+   runs-on: ubuntu-latest
+   name: OpenWrt Config
+   if: verify.steps.isopenwrt.isfile == 'true'
+   needs: Verify
+   steps:
+     - name: X86 Config
+       if: verify.isopenwrt.isx86 == 'true'
+       run: |
+        echo 'test'
+
+
+      
      
 
