@@ -102,6 +102,7 @@ jobs:
   X86 :
    runs-on: ubuntu-latest
    name: Make X86 Config
+   if: always()
    needs: [verify,OpenWrt,Lienol,Lade]
    steps:
      - name: Make OpenWrt Config
