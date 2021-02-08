@@ -1,6 +1,9 @@
 name: Build
 
 on:
+ push:
+    branches:
+      - main
  workflow_dispatch:
     inputs:
       ssh:
@@ -38,26 +41,30 @@ jobs:
       
    - name: Verify OpenWrt
      id: isopenwrt
-     run: |
-      if [ ! -d "openwrt" ];then
-          echo "::set-output name=isfile::true"
-      fi
+     uses: andstor/file-existence-action@v1
+     with:
+      files: "openwrt"
 
-      if [ ! -d "X86" ];then
-          echo "::set-output name=isx86::true"
-      fi
+   - name: Verify lede
+     id: islede
+     uses: andstor/file-existence-action@v1
+     with:
+      files: "lede"
+
+   - name: Verify lienol
+     id: islienol
+     uses: andstor/file-existence-action@v1
+     with:
+      files: "lienol"
+
   OpenWrt :
    runs-on: ubuntu-latest
-   name: OpenWrt Config
-   if: verify.steps.isopenwrt.isfile == 'true'
+   name: OpenWrt Config   
    needs: verify
+   if: needs.steps.isopenwrt.outputs.files_exists == 'true'
    steps:
      - name: X86 Config
-       if: verify.isopenwrt.isx86 == 'true'
-       run: |
-        echo 'test'
-
-
-      
-     
-
+       id: isx86       
+       uses: andstor/file-existence-action@v1
+       with:
+        files: "openwrt/X86,openwrt/X86/feeds.conf.default,openwrt/X86/config.seed"
