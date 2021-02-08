@@ -50,7 +50,7 @@ jobs:
    runs-on: ubuntu-latest
    name: OpenWrt Config
    if: verify.steps.isopenwrt.isfile == 'true'
-   needs: Verify
+   needs: verify
    steps:
      - name: X86 Config
        if: verify.isopenwrt.isx86 == 'true'
