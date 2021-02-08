@@ -43,19 +43,17 @@ jobs:
           echo "isfile=true" >> $GITHUB_ENV
       fi
 
-      if [ ! -d "X86" ];then
+      if [ ! -d "openwrt/X86" ];then
           echo "isx86=true" >> $GITHUB_ENV          
       fi
   OpenWrt :
    runs-on: ubuntu-latest
-   name: OpenWrt Config
+   name: OpenWrt Config   
    needs: verify
    steps:
-     - name: X86 Config
+     - name: X86 Config       
        run: |
         echo 'test'
 
 
-      
-     
-
+    
