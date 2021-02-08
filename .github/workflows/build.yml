@@ -28,7 +28,13 @@ jobs:
    steps:
    - name: Checkout
      uses: actions/checkout@main
-
+   - name: Start SSH via tmate
+     uses: P3TERX/ssh2actions@main
+     if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
+     env:
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      
    - name: Verify X86
      run: |
       df -hT $PWD
