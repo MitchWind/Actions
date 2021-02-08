@@ -61,14 +61,65 @@ jobs:
 
   OpenWrt :
    runs-on: ubuntu-latest
-   name: OpenWrt Config   
+   name: Verify OpenWrt Config   
    needs: verify
    if: needs.verify.outputs.isopenwrt == 'true'
+   outputs:
+    isx86config: ${{ steps.isx86.outputs.files_exists }}
    steps:
-     - name: X86 Config
+     - name: Verify X86 Files
        id: isx86       
        uses: andstor/file-existence-action@v1
        with:
         files: "openwrt/X86,openwrt/X86/feeds.conf.default,openwrt/X86/config.seed"
+  Lienol :
+   runs-on: ubuntu-latest
+   name: Verify Lienol Config   
+   needs: verify
+   if: needs.verify.outputs.islienol == 'true'
+   outputs:
+    isx86config: ${{ steps.isx86.outputs.files_exists }}
+   steps:
+     - name: Verify X86 Files
+       id: isx86       
+       uses: andstor/file-existence-action@v1
+       with:
+        files: "lede/X86,lede/X86/feeds.conf.default,lede/X86/config.seed"
+  Lade :
+   runs-on: ubuntu-latest
+   name: Verify Lade Config   
+   needs: verify
+   if: needs.verify.outputs.islede == 'true'
+   outputs:
+    isx86config: ${{ steps.isx86.outputs.files_exists }}
+   steps:
+     - name: Verify X86 Files
+       id: isx86       
+       uses: andstor/file-existence-action@v1
+       with:
+        files: "lienol/X86,lienol/X86/feeds.conf.default,lienol/X86/config.seed"
+  
+  X86 :
+   runs-on: ubuntu-latest
+   name: Make X86 Config
+   needs: [verify,OpenWrt,Lienol,Lade]
+   steps:
+     - name: Make OpenWrt Config
+       id: makex86openwrt
+       if: (needs.verify.outputs.isopenwrt == 'true') && (needs.OpenWrt.outputs.isx86config == 'true')
+       run: |
+         echo 11
+
+     - name: Make Lade Config
+       id: makex86lade
+       if: (needs.verify.outputs.islede == 'true') && (needs.Lade.outputs.isx86config == 'true')
+       run: |
+         echo 222
+
+     - name: Make Lienol Config
+       id: makex86lienol
+       if: (needs.verify.outputs.islienol == 'true') && (needs.Lienol.outputs.isx86config == 'true')
+       run: |
+         echo 333
 
 
