@@ -26,6 +26,10 @@ jobs:
   verify :
    runs-on: ubuntu-latest
    name: File Verify
+   outputs:
+    isopenwrt: ${{ steps.isopenwrt.outputs.files_exists }}
+    islede: ${{ steps.islede.outputs.files_exists }}
+    islienol: ${{ steps.islienol.outputs.files_exists }}
    steps:
    - name: Checkout
      uses: actions/checkout@main
@@ -54,18 +58,12 @@ jobs:
      uses: andstor/file-existence-action@v1
      with:
       files: "lienol"
-   - name: X86 Config
-     if: steps.isopenwrt.outputs.files_exists == 'true'
-     id: isx86       
-     uses: andstor/file-existence-action@v1
-     with:
-      files: "openwrt/X86,openwrt/X86/feeds.conf.default,openwrt/X86/config.seed"
 
   OpenWrt :
    runs-on: ubuntu-latest
    name: OpenWrt Config   
    needs: verify
-   if: needs.steps.isopenwrt.outputs.files_exists == 'true'
+   if: needs.verify.outputs.isopenwrt == 'true'
    steps:
      - name: X86 Config
        id: isx86       
