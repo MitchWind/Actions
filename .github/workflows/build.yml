@@ -40,17 +40,16 @@ jobs:
      id: isopenwrt
      run: |
       if [ ! -d "openwrt" ];then
-          echo "::set-output name=isfile::true"
+          echo "isfile=true" >> $GITHUB_ENV
       fi
 
       if [ ! -d "X86" ];then
-          echo "::set-output name=isx86::true"
+          echo "isx86=true" >> $GITHUB_ENV          
       fi
   OpenWrt :
    runs-on: ubuntu-latest
-   name: OpenWrt Config   
+   name: OpenWrt Config
    needs: verify
-   if: needs.steps.isopenwrt.isfile == 'true'
    steps:
      - name: X86 Config
        run: |
