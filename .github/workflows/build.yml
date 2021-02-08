@@ -48,12 +48,11 @@ jobs:
       fi
   OpenWrt :
    runs-on: ubuntu-latest
-   name: OpenWrt Config
-   if: verify.steps.isopenwrt.isfile == 'true'
+   name: OpenWrt Config   
    needs: verify
+   if: needs.steps.isopenwrt.isfile == 'true'
    steps:
      - name: X86 Config
-       if: verify.isopenwrt.isx86 == 'true'
        run: |
         echo 'test'
 
