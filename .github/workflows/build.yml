@@ -9,11 +9,11 @@ on:
         default: 'true'
 
 env:
-#Ä¬ÈÏÈí¼ş°ü
+#é»˜è®¤è½¯ä»¶åŒ…
   FEEDS_CONF: feeds.conf.default
-#Ä¬ÈÏÄÚºËÅäÖÃ
+#é»˜è®¤å†…æ ¸é…ç½®
   KERNEL_CONF: kconfig.seed
-#Ä¬ÈÏÄÚºËºêÎÄ¼şÃû
+#é»˜è®¤å†…æ ¸å®æ–‡ä»¶å
   KERNEL_IN: kConfig.in
 
 defaults:
@@ -27,10 +27,10 @@ jobs:
    name: File Verify
    steps:
    - name: Checkout
-      uses: actions/checkout@main
+     uses: actions/checkout@main
 
    - name: Verify X86
-    run: |
-     df -hT $PWD
+     run: |
+      df -hT $PWD
      
 
