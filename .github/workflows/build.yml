@@ -54,6 +54,12 @@ jobs:
      uses: andstor/file-existence-action@v1
      with:
       files: "lienol"
+   - name: X86 Config
+     if: steps.isopenwrt.outputs.files_exists == 'true'
+     id: isx86       
+     uses: andstor/file-existence-action@v1
+     with:
+      files: "openwrt/X86,openwrt/X86/feeds.conf.default,openwrt/X86/config.seed"
 
   OpenWrt :
    runs-on: ubuntu-latest
