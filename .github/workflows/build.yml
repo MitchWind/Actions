@@ -21,7 +21,7 @@ env:
 #是否开启内容合并
   CONF_ISMERGE: true
 #是否自动生成内核宏
-  KERNEL_ISMERAGE: false
+  KERNEL_ISMERAGE: true
 #是否开启内核文件注入到配置
   IS_KERNEL_CONF: true
 
