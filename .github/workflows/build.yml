@@ -24,7 +24,7 @@ defaults:
 jobs:
   verify :
    runs-on: ubuntu-latest
-   name: File Verify
+   name: File Verify ${{matrix.work}}
    env:
      isopenwrt: 'false'
      islede: 'false'
@@ -92,39 +92,12 @@ jobs:
        env:
           MATRIX_CONTEXT: ${{ toJSON(matrix) }}
        run: echo "$MATRIX_CONTEXT"
-             
-  Lienol :
-   runs-on: ubuntu-latest
-   name: Verify Lienol Config   
-   needs: verify
-   if: needs.verify.outputs.islienol == 'true'
-   outputs:
-    isx86config: ${{ steps.isx86.outputs.files_exists }}
-   steps:
-     - name: Verify X86 Files
-       id: isx86       
-       uses: andstor/file-existence-action@v1
-       with:
-        files: "lede/X86,lede/X86/feeds.conf.default,lede/X86/config.seed"
-  Lade :
-   runs-on: ubuntu-latest
-   name: Verify Lade Config   
-   needs: verify
-   if: needs.verify.outputs.islede == 'true'
-   outputs:
-    isx86config: ${{ steps.isx86.outputs.files_exists }}
-   steps:
-     - name: Verify X86 Files
-       id: isx86       
-       uses: andstor/file-existence-action@v1
-       with:
-        files: "lienol/X86,lienol/X86/feeds.conf.default,lienol/X86/config.seed"
-  
+       
   X86 :
    runs-on: ubuntu-latest
    name: Make X86 Config
    if: always()
-   needs: [verify,OpenWrt,Lienol,Lade]
+   needs: [File_Verify_openwrt,File_Verify_lienol,File_Verify_lade]
    steps:
      - name: Make OpenWrt Config
        id: makex86openwrt
