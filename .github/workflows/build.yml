@@ -30,10 +30,6 @@ jobs:
     fail-fast: false
     matrix:
      work: [openwrt,lienol,lede]
-   outputs:
-    isopenwrt: ${{ steps.is${{matrix.work}}.outputs.files_exists }}
-    islede: ${{ steps.is${{matrix.work}}.outputs.files_exists }}
-    islienol: ${{ steps.is${{matrix.work}}.outputs.files_exists }}
    steps:
    - name: Checkout
      uses: actions/checkout@main
