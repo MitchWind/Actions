@@ -41,10 +41,14 @@ jobs:
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
       
-   - name: Verify ${{matrix.work}}
+   - name: Check ${{matrix.work}}
+     id: check_files
      uses: andstor/file-existence-action@v1
      with:
       files: "${{matrix.work}}"
+   - name: File Existence ${{matrix.work}}
+     run: |
+       echo "::set-output name=is${{matrix.work}}::${{steps.check_files.outputs.files_exists}}"
 
   OpenWrt :
    runs-on: ubuntu-latest
