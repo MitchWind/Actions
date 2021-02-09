@@ -37,7 +37,7 @@ jobs:
     fail-fast: false
     matrix:
      work: [openwrt,lienol,lede]
-     arch: [x86,rockchip]
+     arch: [x86]
    outputs:
     isWork: '{"include":["openwrt":${{env.isopenwrt}},"lede":${{env.islede}},"lienol":${{env.islienol}}]}'
    steps:
@@ -77,16 +77,13 @@ jobs:
       if ${{env.CONF_ISMERGE}} ;then
         echo "合并"
         if [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/default/${{matrix.arch}}/default.seed ] ;then
-          cat ${GITHUB_WORKSPACE}/${{matrix.work}}/default/${{matrix.arch}}/default.seed >> \ 
-          ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.config
-
+          cat ${GITHUB_WORKSPACE}/${{matrix.work}}/default/${{matrix.arch}}/default.seed >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.config          
           
         else
           echo "无默认配置无需合并"
         fi
       fi
-      cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.CONFIG_CONF}} >> \ 
-          ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.config  
+      cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.CONFIG_CONF}} >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.config  
 
   OpenWrt :
    runs-on: ubuntu-latest
