@@ -22,6 +22,8 @@ env:
   CONF_ISMERGE: true
 #是否自动生成内核宏
   KERNEL_ISMERAGE: false
+#是否开启内核文件注入到配置
+  IS_KERNEL_CONF: false
 
 defaults:
   run:
@@ -70,14 +72,21 @@ jobs:
       files: "${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}}, ${{matrix.work}}/${{matrix.arch}}/${{env.CONFIG_CONF}}"
    
    - name: Make Config
+     if: steps.check_config.outputs.files_exists == 'true'
      run: |
       if ${{env.CONF_ISMERGE}} ;then
         echo "合并"
-      else
-        echo "不合并"
-        cp ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.CONFIG_CONF}} ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.config
-        ls -lah ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/
-      fi  
+        if [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/default/${{matrix.arch}}/default.seed ] ;then
+          cat ${GITHUB_WORKSPACE}/${{matrix.work}}/default/${{matrix.arch}}/default.seed >> \ 
+          ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.config
+
+          
+        else
+          echo "无默认配置无需合并"
+        fi
+      fi
+      cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.CONFIG_CONF}} >> \ 
+          ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.config  
 
   OpenWrt :
    runs-on: ubuntu-latest
