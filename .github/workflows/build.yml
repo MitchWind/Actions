@@ -96,7 +96,7 @@ jobs:
    runs-on: ubuntu-latest
    name: Make X86 Config
    if: always()
-   needs: [File_Verify_openwrt,File_Verify_lienol,File_Verify_lade]
+   needs: [Verify]
    steps:
      - name: Make OpenWrt Config
        id: makex86openwrt
