@@ -107,6 +107,13 @@ jobs:
       fi
 
       cp ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
+   - name: Start SSH via tmate
+     uses: P3TERX/ssh2actions@main
+     if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
+     env:
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        
    - name: Auto ${{matrix.arch}} Kernel in
      if:  steps.check_config.outputs.files_exists == 'true' && (env.IS_KERNEL_CONF == 'true' && env.IS_KERNEL_CONF != 'false') && env.KERNEL_ISMERAGE == 'true'
      run: |
@@ -117,12 +124,7 @@ jobs:
       rm -rf ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
       .${GITHUB_WORKSPACE}/default/kernel.sh ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
    
-   - name: Start SSH via tmate
-     uses: P3TERX/ssh2actions@main
-     if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
-     env:
-        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+   
    - name: Make ls
      if: steps.check_config.outputs.files_exists == 'true'
      run: |
