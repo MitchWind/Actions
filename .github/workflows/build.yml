@@ -43,7 +43,7 @@ jobs:
    steps:
    - name: Checkout
      uses: actions/checkout@main
-     
+
    - name: Start SSH via tmate
      uses: P3TERX/ssh2actions@main
      if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
@@ -75,12 +75,12 @@ jobs:
      if: steps.check_config.outputs.files_exists == 'true'
      run: |
       if ${{env.CONF_ISMERGE}} ;then
-        if [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/default/${{matrix.arch}}/default.seed ] ;then
-          cat ${GITHUB_WORKSPACE}/${{matrix.work}}/default/${{matrix.arch}}/default.seed >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.config          
+        if [ -f ${GITHUB_WORKSPACE}/default/${{matrix.arch}}/default.seed ] ;then
+          cat ${GITHUB_WORKSPACE}/default/${{matrix.arch}}/default.seed >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.config          
         fi
         #默认所有架构都需要安装的包
-        if [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/default/default.seed ] ;then
-          cat ${GITHUB_WORKSPACE}/${{matrix.work}}/default/default.seed >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.config          
+        if [ -f ${GITHUB_WORKSPACE}/default/default.seed ] ;then
+          cat ${GITHUB_WORKSPACE}/default/default.seed >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.config          
         fi
       fi
       cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.CONFIG_CONF}} >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.config  
@@ -90,19 +90,33 @@ jobs:
      if: env.IS_KERNEL_CONF
      run: |
       #默认
-      if [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/default/${{env.KERNEL_CONF}} ];then 
-          cat ${GITHUB_WORKSPACE}/${{matrix.work}}/default/${{env.KERNEL_CONF}} >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig
+      if [ -f ${GITHUB_WORKSPACE}/default/${{env.KERNEL_CONF}} ];then 
+          cat ${GITHUB_WORKSPACE}/default/${{env.KERNEL_CONF}} >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig
       fi
-      if [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/default/${{env.KERNEL_IN}} ];then 
-          cat ${GITHUB_WORKSPACE}/${{matrix.work}}/default/${{env.KERNEL_IN}} >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in
+      if [ -f ${GITHUB_WORKSPACE}/default/${{env.KERNEL_IN}} ];then 
+          cat ${GITHUB_WORKSPACE}/default/${{env.KERNEL_IN}} >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in
       fi
       #默认指定架构
-      if [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/default/${{matrix.arch}}/${{env.KERNEL_CONF}} ];then 
-          cat ${GITHUB_WORKSPACE}/${{matrix.work}}/default/${{matrix.arch}}/${{env.KERNEL_CONF}} >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig
+      if [ -f ${GITHUB_WORKSPACE}/default/${{matrix.arch}}/${{env.KERNEL_CONF}} ];then 
+          cat ${GITHUB_WORKSPACE}/default/${{matrix.arch}}/${{env.KERNEL_CONF}} >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig
       fi
-      if [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/default/${{matrix.arch}}/${{env.KERNEL_IN}} ];then 
-          cat ${GITHUB_WORKSPACE}/${{matrix.work}}/default/${{matrix.arch}}/${{env.KERNEL_IN}} >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in
+      if [ -f ${GITHUB_WORKSPACE}/default/${{matrix.arch}}/${{env.KERNEL_IN}} ];then 
+          cat ${GITHUB_WORKSPACE}/default/${{matrix.arch}}/${{env.KERNEL_IN}} >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in
       fi
+
+      #指定架构
+      if [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_CONF}} ];then 
+          cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_CONF}} >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig
+      fi
+      if [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}} ];then 
+          cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}} >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in
+      fi
+
+   - name: Make f
+     run: |
+      ls -lah ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/
+      cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig
+      cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in
 
   OpenWrt :
    runs-on: ubuntu-latest
