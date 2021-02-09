@@ -87,7 +87,7 @@ jobs:
       
 
    - name: Make Kernel
-     if: steps.check_work.outputs.files_exists == 'true' && env.IS_KERNEL_CONF == true
+     if:  steps.check_work.outputs.files_exists == 'true' && env.IS_KERNEL_CONF == 'true'
      run: |
       #默认
       if [ -f ${GITHUB_WORKSPACE}/default/${{env.KERNEL_CONF}} ];then 
