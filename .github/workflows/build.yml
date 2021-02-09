@@ -25,10 +25,14 @@ jobs:
   verify :
    runs-on: ubuntu-latest
    name: File Verify
+   env:
+     isWork: '{"include":[]}'
    strategy:
     fail-fast: false
     matrix:
      work: [openwrt,lienol,lede]
+   outputs:
+     matrix: env.isWork
    steps:
    - name: Checkout
      uses: actions/checkout@main
@@ -50,7 +54,8 @@ jobs:
       echo "is${{matrix.work}}=${{steps.check_files.outputs.files_exists}}" >> $GITHUB_ENV
    - name: existes
      if: env.is${{matrix.work}} =='true'
-     run: echo ${{matrix.work}}     
+     run: |
+      echo ${{fromJSON(env.isWork)}}
       
 
   OpenWrt :
