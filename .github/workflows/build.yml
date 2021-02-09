@@ -118,6 +118,9 @@ jobs:
      if:  steps.check_config.outputs.files_exists == 'true' && (env.IS_KERNEL_CONF == 'true' && env.IS_KERNEL_CONF != 'false') && env.KERNEL_ISMERAGE == 'true'
      run: |
       [ -e ${GITHUB_WORKSPACE}/default/kernel.sh ] && chmod +x ${GITHUB_WORKSPACE}/default/kernel.sh
+      echo 'kernel'
+      ls -lah ${GITHUB_WORKSPACE}/default/
+      ls -lah ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/
       rm -rf ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
       ./${GITHUB_WORKSPACE}/default/kernel.sh ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
    - name: Make ls
