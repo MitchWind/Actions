@@ -63,6 +63,7 @@ jobs:
      uses: andstor/file-existence-action@v1.0.1
      with:
       files: "${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}}, ${{matrix.work}}/${{matrix.arch}}/${{env.CONFIG_CONF}}"
+    
    
    - name: Make Config
      if: steps.check_config.outputs.files_exists == 'true'
@@ -121,7 +122,21 @@ jobs:
       echo 'kernel'
       rm -rf ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
       ./default/kernel.sh ${{matrix.work}}/${{matrix.arch}}/.kConfig ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
-   
+   - name: Cache multiple paths
+   - uses: jossef/action-set-json-field@v1
+     with:
+      file: work.json
+      field: ${{matrix.work}}
+      value: ${{steps.check_work.outputs.files_exists}}
+   - uses: actions/cache@v2
+     with:
+       path: |
+        ${{matrix.work}}/${{matrix.arch}}/.config 
+        ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
+       key: ${{matrix.work}}_${{matrix.arch}}_config
+     run: |
+      ls -lah
+
    - name: 'Upload Artifact'
      if: steps.check_config.outputs.files_exists == 'true'
      uses: actions/upload-artifact@v2
@@ -136,7 +151,6 @@ jobs:
      run: |
       [ -d ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/ ] && ls -lah ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/
       [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig ] && cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig
-      echo 'Test'
       [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in ] && cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in
 
   OpenWrt :
