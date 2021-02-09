@@ -20,7 +20,7 @@ env:
 defaults:
   run:
     shell: bash
-    
+
 jobs:
   verify :
    runs-on: ubuntu-latest
@@ -29,6 +29,8 @@ jobs:
     fail-fast: false
     matrix:
      work: [openwrt,lienol,lede]
+   outputs:
+    isopenwrt: ${{ steps.is${{matrix.work}}.outputs.isopenwrt }}
    steps:
    - name: Checkout
      uses: actions/checkout@main
@@ -46,8 +48,9 @@ jobs:
      with:
       files: "${{matrix.work}}"
    - name: File Existence ${{matrix.work}}
-     run: |       
-       ls -lah ${{matrix.work}}
+     run: |
+      echo "is${{matrix.work}}=steps.check_files.outputs.files_exists" >> $GITHUB_ENV      
+      ls -lah ${{matrix.work}}
 
   OpenWrt :
    runs-on: ubuntu-latest
