@@ -117,7 +117,7 @@ jobs:
    - name: Auto ${{matrix.arch}} Kernel in
      if:  steps.check_config.outputs.files_exists == 'true' && (env.IS_KERNEL_CONF == 'true' && env.IS_KERNEL_CONF != 'false') && env.KERNEL_ISMERAGE == 'true'
      run: |
-      if [ -f ${GITHUB_WORKSPACE}/default/kernel.sh ] && chmod +x ${GITHUB_WORKSPACE}/default/kernel.sh
+      [ -f ${GITHUB_WORKSPACE}/default/kernel.sh ] && chmod +x ${GITHUB_WORKSPACE}/default/kernel.sh
       rm -rf ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
       ./${GITHUB_WORKSPACE}/default/kernel.sh ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
    - name: Make ls
