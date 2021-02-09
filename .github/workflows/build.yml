@@ -56,7 +56,7 @@ jobs:
      if: env.is${{matrix.work}} =='true'
      run: |
       echo "${{matrix.work}}:${{steps.check_files.outputs.files_exists}}"
-      echo "::set-output name=matrix::${{steps.check_files.outputs.files_exists}}"
+      echo "::set-env name=isWork::${{steps.check_files.outputs.files_exists}}"
       echo ${{fromJSON(env.isWork)}}
       
 
