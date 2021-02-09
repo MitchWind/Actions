@@ -29,8 +29,6 @@ jobs:
     fail-fast: false
     matrix:
      work: [openwrt,lienol,lede]
-   outputs:
-    isopenwrt: ${{ steps.is${{matrix.work}}.outputs.isopenwrt }}
    steps:
    - name: Checkout
      uses: actions/checkout@main
@@ -70,7 +68,7 @@ jobs:
    runs-on: ubuntu-latest
    name: Verify Lienol Config   
    needs: verify
-   if: needs.verify.outputs.islienol == 'true'
+   if: needs.verify.env.islienol == 'true'
    outputs:
     isx86config: ${{ steps.isx86.outputs.files_exists }}
    steps:
