@@ -75,15 +75,16 @@ jobs:
      if: steps.check_config.outputs.files_exists == 'true'
      run: |
       if ${{env.CONF_ISMERGE}} ;then
-        echo "合并"
+        echo "${GITHUB_WORKSPACE}"
         if [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/default/${{matrix.arch}}/default.seed ] ;then
           cat ${GITHUB_WORKSPACE}/${{matrix.work}}/default/${{matrix.arch}}/default.seed >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.config          
-          
+
         else
           echo "无默认配置无需合并"
         fi
       fi
       cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.CONFIG_CONF}} >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.config  
+      ls -lah ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/
 
   OpenWrt :
    runs-on: ubuntu-latest
