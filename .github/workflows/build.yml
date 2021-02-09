@@ -47,7 +47,7 @@ jobs:
       files: "${{matrix.work}}"
    - name: File Existence ${{matrix.work}}
      run: |
-      echo "is${{matrix.work}}=steps.check_files.outputs.files_exists" >> $GITHUB_ENV      
+      echo "is${{matrix.work}}=${{steps.check_files.outputs.files_exists}}" >> $GITHUB_ENV      
       ls -lah ${{matrix.work}}
 
   OpenWrt :
