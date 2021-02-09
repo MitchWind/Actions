@@ -48,7 +48,7 @@ jobs:
       files: "${{matrix.work}}"
    - name: File Existence ${{matrix.work}}
      run: |       
-       echo "${{matrix.work}}""
+       ls -lah ${{matrix.work}}
 
   OpenWrt :
    runs-on: ubuntu-latest
