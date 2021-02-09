@@ -57,8 +57,6 @@ jobs:
      run: |
       echo "${{matrix.work}}:${{steps.check_files.outputs.files_exists}}"
       echo "::set-env name=isWork::${{steps.check_files.outputs.files_exists}}"
-      echo ${{fromJSON(env.isWork)}}
-      
 
   OpenWrt :
    runs-on: ubuntu-latest
