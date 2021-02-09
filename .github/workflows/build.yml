@@ -47,8 +47,7 @@ jobs:
      with:
       files: "${{matrix.work}}"
    - name: File Existence ${{matrix.work}}
-     run: |
-       echo "::set-output name=is${{matrix.work}}::${{steps.check_files.outputs.files_exists}}"
+     run: |       
        echo "${{matrix.work}}""
 
   OpenWrt :
