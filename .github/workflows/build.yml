@@ -32,7 +32,7 @@ jobs:
     matrix:
      work: [openwrt,lienol,lede]
    outputs:
-     matrix: env.isWork
+     matrix: ${{ env.isWork }}
    steps:
    - name: Checkout
      uses: actions/checkout@main
