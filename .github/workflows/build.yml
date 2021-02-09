@@ -97,7 +97,7 @@ jobs:
    runs-on: ubuntu-latest
    name: Verify Lienol Config   
    needs: verify
-   if: needs.verify.env.islienol == 'true'
+   if: needs.verify.outputs.islienol == 'true'
    outputs:
     isx86config: ${{ steps.isx86.outputs.files_exists }}
    steps:
