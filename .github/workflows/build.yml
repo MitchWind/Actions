@@ -100,6 +100,11 @@ jobs:
    steps:
      - name: Make OpenWrt Config
        id: makex86openwrt
+       if: env.islede == 'true'
+       run: |
+         echo ${{env.islede}}
+     - name: Make OpenWrt Config
+       id: makex86openwrt
        if: (needs.verify.outputs.isopenwrt == 'true') && (needs.OpenWrt.outputs.isx86config == 'true')
        run: |
          echo 11
