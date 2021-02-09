@@ -56,16 +56,35 @@ jobs:
   OpenWrt :
    runs-on: ubuntu-latest
    name: Verify OpenWrt Config   
-   needs: verify
-   if: env.isopenwrt == 'true'
+   needs: verify   
    outputs:
     isx86config: ${{ steps.isx86.outputs.isconfig }}
    steps:
-     - name: Verify X86 Files
-       uses: andstor/file-existence-action@v1
-       id: isx86 
-       with:
-         files: "openwrt/X86,openwrt/X86/config.seed"
+     - name: Dump GitHub context
+       env:
+        GITHUB_CONTEXT: ${{ toJSON(github) }}
+       run: echo "$GITHUB_CONTEXT"
+
+     - name: Dump job context
+       env:
+        JOB_CONTEXT: ${{ toJSON(job) }}
+       run: echo "$JOB_CONTEXT"
+     - name: Dump steps context
+       env:
+        STEPS_CONTEXT: ${{ toJSON(steps) }}
+       run: echo "$STEPS_CONTEXT"
+     - name: Dump runner context
+       env:
+          RUNNER_CONTEXT: ${{ toJSON(runner) }}
+       run: echo "$RUNNER_CONTEXT"
+     - name: Dump strategy context
+       env:
+          STRATEGY_CONTEXT: ${{ toJSON(strategy) }}
+       run: echo "$STRATEGY_CONTEXT"
+     - name: Dump matrix context
+       env:
+          MATRIX_CONTEXT: ${{ toJSON(matrix) }}
+       run: echo "$MATRIX_CONTEXT"
              
   Lienol :
    runs-on: ubuntu-latest
