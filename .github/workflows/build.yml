@@ -123,17 +123,11 @@ jobs:
       rm -rf ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
       ./default/kernel.sh ${{matrix.work}}/${{matrix.arch}}/.kConfig ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
    - name: Cache multiple paths
-   - uses: jossef/action-set-json-field@v1
+     uses: jossef/action-set-json-field@v1
      with:
       file: work.json
       field: ${{matrix.work}}
-      value: ${{steps.check_work.outputs.files_exists}}
-   - uses: actions/cache@v2
-     with:
-       path: |
-        ${{matrix.work}}/${{matrix.arch}}/.config 
-        ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
-       key: ${{matrix.work}}_${{matrix.arch}}_config
+      value: ${{steps.check_work.outputs.files_exists}}   
 
    - name: 'Upload Artifact'
      if: steps.check_config.outputs.files_exists == 'true'
