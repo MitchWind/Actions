@@ -122,7 +122,7 @@ jobs:
       ls -lah ${GITHUB_WORKSPACE}/default/
       ls -lah ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/
       rm -rf ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
-      ./${GITHUB_WORKSPACE}/default/kernel.sh ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
+      .${GITHUB_WORKSPACE}/default/kernel.sh ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
    - name: Make ls
      if: steps.check_config.outputs.files_exists == 'true'
      run: |
