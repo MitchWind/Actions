@@ -51,7 +51,7 @@ jobs:
       files: "${{matrix.work}}"
    - name: File Existence ${{matrix.work}}
      run: |
-      echo "isWork=${{steps.check_files.outputs.files_exists}}" >> $GITHUB_ENV
+      echo "isWork.include.${{matrix.work}}=${{steps.check_files.outputs.files_exists}}" >> $GITHUB_ENV
    - name: existes
      if: env.is${{matrix.work}} =='true'
      run: |
