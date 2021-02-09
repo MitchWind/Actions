@@ -48,21 +48,21 @@ jobs:
       
    - name: Check work ${{matrix.work}}
      id: check_work
-     uses: andstor/file-existence-action@v1
+     uses: andstor/file-existence-action@v1.0.1
      with:
       files: "${{matrix.work}}"
 
    - name: Check ${{matrix.work}} Arch ${{matrix.arch}}
      id: check_arch
      if: steps.check_work.outputs.files_exists == 'true'
-     uses: andstor/file-existence-action@v1
+     uses: andstor/file-existence-action@v1.0.1
      with:
       files: "${{matrix.work}}/${{matrix.arch}}/kConfig.in"
 
    - name: Check ${{matrix.work}} Arch ${{matrix.arch}} Config
      id: check_config
      if: steps.check_arch.outputs.files_exists == 'true'
-     uses: andstor/file-existence-action@v1
+     uses: andstor/file-existence-action@v1.0.1
      with:
       files: "${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}}, ${{matrix.work}}/${{matrix.arch}}/${{env.config.seed}}"
    - name: Make Config
