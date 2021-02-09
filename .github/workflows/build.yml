@@ -112,12 +112,12 @@ jobs:
           cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}} >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in
       fi
 
-   - name: Make f
+   - name: Make ls
      if: steps.check_work.outputs.files_exists == 'true'
      run: |
-      ls -lah ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/
-      cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig
-      cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in
+      [ -d ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/ ] ls -lah ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/
+      [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig ] && cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig
+      [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in ]cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in
 
   OpenWrt :
    runs-on: ubuntu-latest
