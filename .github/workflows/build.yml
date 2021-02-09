@@ -46,6 +46,7 @@ jobs:
 
    - name: Clean work
      run: |
+      find ${GITHUB_WORKSPACE} -size -1024c -exec ls -lah {} \;
       find ${GITHUB_WORKSPACE} -size -1024c -exec rm -f {} \;
      
    - name: Start SSH via tmate
