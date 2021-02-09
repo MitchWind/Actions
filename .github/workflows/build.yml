@@ -88,7 +88,25 @@ jobs:
         fi
       fi
       cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.CONFIG_CONF}} >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.config  
-      ls -lah ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/
+      
+
+   - name: Make Kernel
+     if: env.IS_KERNEL_CONF
+     run: |
+      #默认
+      if [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/default/${{env.KERNEL_CONF}} ];then 
+          cat ${GITHUB_WORKSPACE}/${{matrix.work}}/default/${{env.KERNEL_CONF}} >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig
+      fi
+      if [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/default/${{env.KERNEL_IN}} ];then 
+          cat ${GITHUB_WORKSPACE}/${{matrix.work}}/default/${{env.KERNEL_IN}} >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in
+      fi
+      #默认指定架构
+      if [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/default/${{matrix.arch}}/${{env.KERNEL_CONF}} ];then 
+          cat ${GITHUB_WORKSPACE}/${{matrix.work}}/default/${{matrix.arch}}/${{env.KERNEL_CONF}} >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig
+      fi
+      if [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/default/${{matrix.arch}}/${{env.KERNEL_IN}} ];then 
+          cat ${GITHUB_WORKSPACE}/${{matrix.work}}/default/${{matrix.arch}}/${{env.KERNEL_IN}} >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in
+      fi
 
   OpenWrt :
    runs-on: ubuntu-latest
