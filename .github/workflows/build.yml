@@ -32,7 +32,7 @@ jobs:
     fail-fast: false
     matrix:
      work: [openwrt,lienol,lede]
-     arch: [X86,rockchip]
+     arch: [x86,rockchip]
    outputs:
     isWork: '{"include":["openwrt":${{env.isopenwrt}},"lede":${{env.islede}},"lienol":${{env.islienol}}]}'
    steps:
