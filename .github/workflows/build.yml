@@ -17,10 +17,6 @@ env:
 #默认内核宏文件名
   KERNEL_IN: kConfig.in
 
-defaults:
-  run:
-    shell: bash
-    working-directory: scripts
 
 jobs:
   verify :
