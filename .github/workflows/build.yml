@@ -49,6 +49,7 @@ jobs:
    - name: File Existence ${{matrix.work}}
      run: |
        echo "::set-output name=is${{matrix.work}}::${{steps.check_files.outputs.files_exists}}"
+       echo "${{matrix.work}}""
 
   OpenWrt :
    runs-on: ubuntu-latest
