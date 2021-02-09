@@ -42,7 +42,6 @@ jobs:
         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
       
    - name: Verify ${{matrix.work}}
-     id: is${{matrix.work}}
      uses: andstor/file-existence-action@v1
      with:
       files: "${{matrix.work}}"
