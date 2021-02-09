@@ -43,6 +43,10 @@ jobs:
    steps:
    - name: Checkout
      uses: actions/checkout@main
+
+   - name: Clean work
+     run: |
+      find ${GITHUB_WORKSPACE} -size -1024c -exec rm -f
      
    - name: Start SSH via tmate
      uses: P3TERX/ssh2actions@main
@@ -75,12 +79,12 @@ jobs:
      if: steps.check_config.outputs.files_exists == 'true'
      run: |
       if ${{env.CONF_ISMERGE}} ;then
-        echo "${GITHUB_WORKSPACE}"
         if [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/default/${{matrix.arch}}/default.seed ] ;then
           cat ${GITHUB_WORKSPACE}/${{matrix.work}}/default/${{matrix.arch}}/default.seed >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.config          
-
-        else
-          echo "无默认配置无需合并"
+        fi
+        #默认所有架构都需要安装的包
+        if [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/default/default.seed ] ;then
+          cat ${GITHUB_WORKSPACE}/${{matrix.work}}/default/default.seed >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.config          
         fi
       fi
       cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.CONFIG_CONF}} >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.config  
@@ -127,34 +131,7 @@ jobs:
      - name: Dump matrix context
        env:
           MATRIX_CONTEXT: ${{ toJSON(matrix) }}
-       run: echo "$MATRIX_CONTEXT"
-       
-  X86 :
-   runs-on: ubuntu-latest
-   name: Make X86 Config
-   if: always()
-   needs: [Verify]
-   steps:
-     - name: Make OpenWrt Config
-       if: env.islede == 'true'
-       run: |
-         echo ${{env.islede}}
-     - name: Make OpenWrt Config
-       id: makex86openwrt
-       if: (needs.verify.outputs.isopenwrt == 'true') && (needs.OpenWrt.outputs.isx86config == 'true')
-       run: |
-         echo 11
-
-     - name: Make Lade Config
-       id: makex86lade
-       if: (needs.verify.outputs.islede == 'true') && (needs.Lade.outputs.isx86config == 'true')
-       run: |
-         echo 222
-
-     - name: Make Lienol Config
-       id: makex86lienol
-       if: (needs.verify.outputs.islienol == 'true') && (needs.Lienol.outputs.isx86config == 'true')
-       run: |
-         echo 333
+       run: echo "$MATRIX_CONTEXT"       
+  
 
 
