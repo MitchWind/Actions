@@ -57,7 +57,7 @@ jobs:
    runs-on: ubuntu-latest
    name: Verify OpenWrt Config   
    needs: verify
-   if: needs.verify.outputs.isopenwrt == 'true'
+   if: env.isopenwrt == 'true'
    outputs:
     isx86config: ${{ steps.isx86.outputs.isconfig }}
    steps:
