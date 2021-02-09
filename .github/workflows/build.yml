@@ -20,6 +20,8 @@ env:
   KERNEL_IN: kConfig.in
 #是否开启内容合并
   CONF_ISMERGE: true
+#是否自动生成内核宏
+  KERNEL_ISMERAGE: false
 
 defaults:
   run:
@@ -73,6 +75,8 @@ jobs:
         echo "合并"
       else
         echo "不合并"
+        cp ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.CONFIG_CONF}} ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.config
+        ls -lah ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/
       fi  
 
   OpenWrt :
