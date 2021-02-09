@@ -99,7 +99,6 @@ jobs:
    needs: [Verify]
    steps:
      - name: Make OpenWrt Config
-       id: makex86openwrt
        if: env.islede == 'true'
        run: |
          echo ${{env.islede}}
