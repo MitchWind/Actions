@@ -26,10 +26,14 @@ jobs:
   verify :
    runs-on: ubuntu-latest
    name: File Verify
+   strategy:
+    fail-fast: false
+    matrix:
+     work: [openwrt,lienol,lede]
    outputs:
-    isopenwrt: ${{ steps.isopenwrt.outputs.files_exists }}
-    islede: ${{ steps.islede.outputs.files_exists }}
-    islienol: ${{ steps.islienol.outputs.files_exists }}
+    isopenwrt: ${{ steps.is${{matrix.work}}.outputs.files_exists }}
+    islede: ${{ steps.is${{matrix.work}}.outputs.files_exists }}
+    islienol: ${{ steps.is${{matrix.work}}.outputs.files_exists }}
    steps:
    - name: Checkout
      uses: actions/checkout@main
@@ -41,23 +45,11 @@ jobs:
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
       
-   - name: Verify OpenWrt
-     id: isopenwrt
+   - name: Verify ${{matrix.work}}
+     id: is${{matrix.work}}
      uses: andstor/file-existence-action@v1
      with:
-      files: "openwrt"
-
-   - name: Verify lede
-     id: islede
-     uses: andstor/file-existence-action@v1
-     with:
-      files: "lede"
-
-   - name: Verify lienol
-     id: islienol
-     uses: andstor/file-existence-action@v1
-     with:
-      files: "lienol"
+      files: "${{matrix.work}}"
 
   OpenWrt :
    runs-on: ubuntu-latest
@@ -68,13 +60,11 @@ jobs:
     isx86config: ${{ steps.isx86.outputs.isconfig }}
    steps:
      - name: Verify X86 Files
-       id: isx86       
-       run: |
-        if ( [ -d openwrt/X86 ] && [ -f openwrt/X86/config.seed ] && [ -f openwrt/X86/feeds.conf.default ] ) ;then
-          echo "11"
-        else
-          echo "222"
-        fi
+       uses: andstor/file-existence-action@v1
+       id: isx86 
+       with:
+         files: "openwrt/X86,openwrt/X86/config.seed"
+             
   Lienol :
    runs-on: ubuntu-latest
    name: Verify Lienol Config   
