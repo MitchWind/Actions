@@ -51,12 +51,14 @@ jobs:
       files: "${{matrix.work}}"
    - name: File Existence ${{matrix.work}}
      run: |
-      echo "is${{matrix.work}}=${{steps.check_files.outputs.files_exists}}" >> $GITHUB_ENV
+      echo "isWork=${{steps.check_files.outputs.files_exists}}" >> $GITHUB_ENV
    - name: existes
      if: env.is${{matrix.work}} =='true'
      run: |
       echo "${{matrix.work}}:${{steps.check_files.outputs.files_exists}}"
-      echo "::set-env name=isWork::${{steps.check_files.outputs.files_exists}}"
+      echo "::set-output name=isWork::${{steps.check_files.outputs.files_exists}}"
+      echo ${{toJSON(env.isWork)}}
+      
 
   OpenWrt :
    runs-on: ubuntu-latest
