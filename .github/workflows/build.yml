@@ -16,6 +16,9 @@ env:
   KERNEL_CONF: kconfig.seed
 #默认内核宏文件名
   KERNEL_IN: kConfig.in
+  isopenwrt: 'false'
+  islede: 'false'
+  islienol: 'false'
 
 defaults:
   run:
@@ -24,11 +27,7 @@ defaults:
 jobs:
   verify :
    runs-on: ubuntu-latest
-   name: File_Verify_${{matrix.work}}
-   env:
-     isopenwrt: 'false'
-     islede: 'false'
-     islienol: 'false'
+   name: File Verify ${{matrix.work}}
    strategy:
     fail-fast: false
     matrix:
