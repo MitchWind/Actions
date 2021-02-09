@@ -24,7 +24,7 @@ defaults:
 jobs:
   verify :
    runs-on: ubuntu-latest
-   name: File Verify ${{matrix.work}}
+   name: File_Verify_${{matrix.work}}
    env:
      isopenwrt: 'false'
      islede: 'false'
