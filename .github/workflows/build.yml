@@ -87,7 +87,7 @@ jobs:
       
 
    - name: Make Kernel
-     if: env.IS_KERNEL_CONF == true && steps.check_work.outputs.files_exists == 'true'
+     if: env.IS_KERNEL_CONF == true || steps.check_work.outputs.files_exists == 'true'
      run: |
       #默认
       if [ -f ${GITHUB_WORKSPACE}/default/${{env.KERNEL_CONF}} ];then 
@@ -113,7 +113,7 @@ jobs:
       fi
 
    - name: Make f
-     if: ${{ success() }}
+     if: steps.check_work.outputs.files_exists == 'true'
      run: |
       ls -lah ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/
       cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig
