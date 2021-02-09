@@ -27,11 +27,12 @@ defaults:
 jobs:
   verify :
    runs-on: ubuntu-latest
-   name: File Verify ${{matrix.work}}
+   name: File Verify ${{matrix.work}} ${{matrix.arch}}
    strategy:
     fail-fast: false
     matrix:
      work: [openwrt,lienol,lede]
+     arch: [X86,rockchip]
    outputs:
     isWork: '{"include":["openwrt":${{env.isopenwrt}},"lede":${{env.islede}},"lienol":${{env.islienol}}]}'
    steps:
