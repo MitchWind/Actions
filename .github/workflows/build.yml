@@ -134,8 +134,6 @@ jobs:
         ${{matrix.work}}/${{matrix.arch}}/.config 
         ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
        key: ${{matrix.work}}_${{matrix.arch}}_config
-   - run: |
-      ls -lah
 
    - name: 'Upload Artifact'
      if: steps.check_config.outputs.files_exists == 'true'
