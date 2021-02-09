@@ -34,7 +34,7 @@ jobs:
     matrix:
      work: [openwrt,lienol,lede]
    outputs:
-    isWork: '{"include":["openwrt":${{env.isopenwrt}},"lede":${{env.islede}}]}'
+    isWork: '{"include":["openwrt":${{env.isopenwrt}},"lede":${{env.islede}},"lienol":${{env.islienol}}]}'
    steps:
    - name: Checkout
      uses: actions/checkout@main
@@ -53,14 +53,7 @@ jobs:
       files: "${{matrix.work}}"
    - name: File Existence ${{matrix.work}}
      run: |
-      echo "isWork.include.${{matrix.work}}=${{steps.check_files.outputs.files_exists}}" >> $GITHUB_ENV
-   - name: existes
-     if: env.is${{matrix.work}} =='true'
-     run: |
-      echo "${{matrix.work}}:${{steps.check_files.outputs.files_exists}}"
-      echo "::set-output name=isWork::${{steps.check_files.outputs.files_exists}}"
-      echo ${{toJSON(env.isWork)}}
-      
+      echo "is${{matrix.work}}=${{steps.check_files.outputs.files_exists}}" >> $GITHUB_ENV
 
   OpenWrt :
    runs-on: ubuntu-latest
