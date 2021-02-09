@@ -61,6 +61,11 @@ jobs:
    outputs:
     isx86config: ${{ steps.isx86.outputs.isconfig }}
    steps:
+     - name: env
+       run:  |
+        echo "${{env.isopenwrt}}"
+        echo "${{ toJSON(env) }}"
+
      - name: Dump GitHub context
        env:
         GITHUB_CONTEXT: ${{ toJSON(github) }}
