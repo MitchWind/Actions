@@ -105,7 +105,7 @@ jobs:
       if [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}} ];then 
           cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}} >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in          
       fi
-      $(cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig) >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.config
+      cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.config
       cp ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
    - name: Start SSH via tmate
      uses: P3TERX/ssh2actions@main
