@@ -138,74 +138,66 @@ jobs:
       [ -d ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/ ] && ls -lah ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/
       [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig ] && cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig
       [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in ] && cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in
-
-   - uses: actions/cache@v2
+   - name: Cache Config
+     if: steps.check_config.outputs.files_exists == 'true'
+     uses: actions/cache@v2
      with:
-      path: default/work.json
-      key: workjson
+      path: |
+       ${{matrix.work}}/${{matrix.arch}}/.config 
+       ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
+      key: ${{matrix.work}}_${{matrix.arch}}_config
 
-   - name: Cache ${{matrix.work}} json
-     uses: jossef/action-set-json-field@v1
-     with:
-      file: default/work.json
-      field: ${{matrix.work}}
-      value: ${{steps.check_work.outputs.files_exists}}
+  #  - name: Cache ${{matrix.work}} json
+  #    uses: jossef/action-set-json-field@v1
+  #    with:
+  #     file: default/work.json
+  #     field: ${{matrix.work}}
+  #     value: ${{steps.check_work.outputs.files_exists}}
 
-   - name: Cache ${{matrix.arch}} json
-     if:  steps.check_work.outputs.files_exists == 'true'
-     uses: jossef/action-set-json-field@v1
-     with:
-      file: default/work.json
-      field: openwrt.jfs
-      value: ${{steps.check_arch.outputs.files_exists}}
+  #  - name: Cache ${{matrix.arch}} json
+  #    if:  steps.check_work.outputs.files_exists == 'true'
+  #    uses: jossef/action-set-json-field@v1
+  #    with:
+  #     file: default/work.json
+  #     field: openwrt.json
+  #     value: ${{steps.check_arch.outputs.files_exists}}
 
-   - name: 'Viem JSON'
-     if: ${{ success() }}
-     run: |
-      cat default/work.json     
+  #  - name: 'Viem JSON'
+  #    if: ${{ success() }}
+  #    run: |
+  #     cat default/work.json     
 
-  OpenWrt :
+  Make :
    runs-on: ubuntu-latest
    name: Verify OpenWrt Config   
    needs: verify   
-   outputs:
-    isx86config: ${{ steps.isx86.outputs.isconfig }}
+   strategy:
+    fail-fast: false
+    matrix:
+     work: [openwrt,lienol,lede]
+     arch: [x86]
    steps:
-     - name: env
-       run:  |
-        echo "${{env.isopenwrt}}"
-        echo "${{ toJSON(env) }}"
+     - name: Checkout
+       uses: actions/checkout@main
 
-     - name: Dump GitHub context
-       env:
-        GITHUB_CONTEXT: ${{ toJSON(github) }}
-       run: echo "$GITHUB_CONTEXT"
+     - uses: actions/download-artifact@v2
+       with:
+         name: ${{matrix.work}}_${{matrix.arch}}_config
 
-     - name: Dump GitHub noeeds
-       env:
-        NEEDS_CONTEXT: ${{ toJSON(needs) }}
-       run: echo "$NEEDS_CONTEXT"
+     - name: Check ${{matrix.work}} ${{matrix.arch}} Config
+       id: check_config
+       uses: andstor/file-existence-action@v1.0.1
+       with:
+         files: "${{matrix.work}}, ${{matrix.work}}/${{matrix.arch}}, ${{matrix.work}}/${{matrix.arch}}/.config,${{matrix.work}}/${{matrix.arch}}/${{FEEDS_CONF}}"
 
-     - name: Dump job context
-       env:
-        JOB_CONTEXT: ${{ toJSON(job) }}
-       run: echo "$JOB_CONTEXT"
-     - name: Dump steps context
-       env:
-        STEPS_CONTEXT: ${{ toJSON(steps) }}
-       run: echo "$STEPS_CONTEXT"
-     - name: Dump runner context
-       env:
-          RUNNER_CONTEXT: ${{ toJSON(runner) }}
-       run: echo "$RUNNER_CONTEXT"
-     - name: Dump strategy context
-       env:
-          STRATEGY_CONTEXT: ${{ toJSON(strategy) }}
-       run: echo "$STRATEGY_CONTEXT"
-     - name: Dump matrix context
-       env:
-          MATRIX_CONTEXT: ${{ toJSON(matrix) }}
-       run: echo "$MATRIX_CONTEXT"       
+     - name: Is Check
+       run: |
+        if steps.check_config.outputs.files_exists == true ;then
+          echo "找到文件"
+        else
+          echo "没找到工作组件"
+        fi
+              
   
 
 
