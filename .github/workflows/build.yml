@@ -122,6 +122,23 @@ jobs:
       echo 'kernel'
       rm -rf ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
       ./default/kernel.sh ${{matrix.work}}/${{matrix.arch}}/.kConfig ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
+
+   - name: 'Upload Artifact'
+     if: steps.check_config.outputs.files_exists == 'true'
+     uses: actions/upload-artifact@v2
+     with:
+      name: ${{matrix.work}}_${{matrix.arch}}_config
+      path: |
+       ${{matrix.work}}/${{matrix.arch}}/.config 
+       ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
+
+   - name: Make ls
+     if: steps.check_config.outputs.files_exists == 'true'
+     run: |
+      [ -d ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/ ] && ls -lah ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/
+      [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig ] && cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig
+      [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in ] && cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in
+
    - uses: actions/cache@v2
      with:
       path: default/work.json
@@ -139,29 +156,13 @@ jobs:
      uses: jossef/action-set-json-field@v1
      with:
       file: default/work.json
-      field: ${{matrix.work}}.${{matrix.arch}}
+      field: openwrt.jfs
       value: ${{steps.check_arch.outputs.files_exists}}
 
    - name: 'Viem JSON'
      if: ${{ success() }}
      run: |
-      cat default/work.json       
-
-   - name: 'Upload Artifact'
-     if: steps.check_config.outputs.files_exists == 'true'
-     uses: actions/upload-artifact@v2
-     with:
-      name: ${{matrix.work}}_${{matrix.arch}}_config
-      path: |
-       ${{matrix.work}}/${{matrix.arch}}/.config 
-       ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
-
-   - name: Make ls
-     if: steps.check_config.outputs.files_exists == 'true'
-     run: |
-      [ -d ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/ ] && ls -lah ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/
-      [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig ] && cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig
-      [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in ] && cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in
+      cat default/work.json     
 
   OpenWrt :
    runs-on: ubuntu-latest
