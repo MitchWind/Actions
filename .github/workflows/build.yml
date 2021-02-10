@@ -126,7 +126,7 @@ jobs:
      with:
       path: default/work.json
       key: workjson
-      
+
    - name: Cache ${{matrix.work}} json
      uses: jossef/action-set-json-field@v1
      with:
@@ -135,12 +135,12 @@ jobs:
       value: ${{steps.check_work.outputs.files_exists}}
 
    - name: Cache ${{matrix.arch}} json
-     if:  steps.check_config.outputs.files_exists == 'true'
+     if:  steps.check_work.outputs.files_exists == 'true'
      uses: jossef/action-set-json-field@v1
      with:
       file: default/work.json
       field: ${{matrix.work}}.${{matrix.arch}}
-      value: ${{steps.check_config.outputs.files_exists}}
+      value: ${{steps.check_arch.outputs.files_exists}}
 
    - name: 'Upload Wrok JSON'
      if: steps.check_config.outputs.files_exists == 'true'
