@@ -142,8 +142,8 @@ jobs:
       field: ${{matrix.work}}.${{matrix.arch}}
       value: ${{steps.check_arch.outputs.files_exists}}
 
-   - name: 'Upload Wrok JSON'
-     if: steps.check_config.outputs.files_exists == 'true'
+   - name: 'Viem JSON'
+     if: ${{ success() }}
      run: |
       cat default/work.json       
 
