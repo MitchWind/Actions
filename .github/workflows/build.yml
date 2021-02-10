@@ -212,22 +212,22 @@ jobs:
          sudo chown $USER:$GROUPS /${{matrix.work}}
 
      - name: Load ${{matrix.work}} Settings.ini
-       if:  success() 
+       if:  ${{ !cancelled() }}
        run: |
         source "${GITHUB_WORKSPACE}/${{matrix.work}}/settings.ini"
         echo "REPO_URL=${REPO_URL}" >> $GITHUB_ENV
         echo "REPO_BRANCH=${REPO_BRANCH}" >> $GITHUB_ENV
 
      - name:  Clone ${{matrix.work}} source code
-       if:  success() 
+       if:  ${{ !cancelled() }}
        working-directory: /${{matrix.work}}
        run: |
         df -hT $PWD
         git clone $REPO_URL -b $REPO_BRANCH work
         ln -sf /${{matrix.work}}/work $GITHUB_WORKSPACE/work
      
-     - name: CP ${{matrix.arch}} Config
-       if:  success() 
+     - name: cp ${{matrix.arch}} Config
+       if:  ${{ !cancelled() }}
        run: |
         [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}} ] && cp ${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}} work/feeds.conf.default
         cd work/ && git status
