@@ -188,7 +188,7 @@ jobs:
        id: check_config
        uses: andstor/file-existence-action@v1.0.1
        with:
-         files: "${{matrix.work}}, ${{matrix.work}}/${{matrix.arch}}, ${{matrix.work}}/${{matrix.arch}}/.config,${{matrix.work}}/${{matrix.arch}}/${{FEEDS_CONF}}"
+         files: "${{matrix.work}}, ${{matrix.work}}/${{matrix.arch}}, ${{matrix.work}}/${{matrix.arch}}/.config,${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}}"
 
      - name: Is Check
        run: |
