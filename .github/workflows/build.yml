@@ -122,9 +122,10 @@ jobs:
       echo 'kernel'
       rm -rf ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
       ./default/kernel.sh ${{matrix.work}}/${{matrix.arch}}/.kConfig ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
-   - uses: actions/download-artifact@v2
+   - uses: actions/cache@v2
      with:
-      name: workjson 
+      path: default/work.json
+      key: workjson
    - name: Cache ${{matrix.work}} json
      uses: jossef/action-set-json-field@v1
      with:
