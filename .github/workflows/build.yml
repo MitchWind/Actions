@@ -122,12 +122,31 @@ jobs:
       echo 'kernel'
       rm -rf ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
       ./default/kernel.sh ${{matrix.work}}/${{matrix.arch}}/.kConfig ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
-   - name: Cache multiple paths
+   - uses: actions/download-artifact@v2
+     with:
+      name: workjson 
+   - name: Cache ${{matrix.work}} json
      uses: jossef/action-set-json-field@v1
      with:
-      file: work.json
+      file: default/work.json
       field: ${{matrix.work}}
-      value: ${{steps.check_work.outputs.files_exists}}   
+      value: ${{steps.check_work.outputs.files_exists}}
+
+   - name: Cache ${{matrix.arch}} json
+     uses: jossef/action-set-json-field@v1
+     with:
+      file: default/work.json
+      field: ${{matrix.work}}.${{matrix.arch}}
+      value: ${{steps.check_config.outputs.files_exists}}
+
+   - name: 'Upload Wrok JSON'
+     if: steps.check_config.outputs.files_exists == 'true'
+     uses: actions/upload-artifact@v2
+     with:
+      name: workjson
+      path: default/work.json
+   - run: |
+      cat default/work.json       
 
    - name: 'Upload Artifact'
      if: steps.check_config.outputs.files_exists == 'true'
