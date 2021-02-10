@@ -199,12 +199,10 @@ jobs:
          files: "${{matrix.work}}, ${{matrix.work}}/${{matrix.arch}}, ${{matrix.work}}/${{matrix.arch}}/.config,${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}}"
 
      - name: Is Check
+       if: steps.check_config.outputs.files_exists == 'true'
        run: |
-        if steps.check_config.outputs.files_exists == true ;then
-          echo "找到文件"
-        else
-          echo "没找到工作组件"
-        fi
+         echo "有配置文件继续后面流程"
+         ls -lah ${{matrix.work}}/${{matrix.arch}}
      
               
   
