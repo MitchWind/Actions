@@ -208,8 +208,9 @@ jobs:
        run: echo "IS_CONFIG_CONF=true" >> $GITHUB_ENV
     #找到必要配置文件开始设置运行环境
      - name: Initialization 
-       if: env.IS_CONFIG_CONF
+       if: steps.check_config.outputs.files_exists == 'true'
        run: |
+         echo ${IS_CONFIG_CONF}
          echo "有配置文件继续后面流程"
          sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
          sudo -E apt-get -qq update
