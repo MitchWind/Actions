@@ -241,6 +241,7 @@ jobs:
         cd work/ && git status
 
      - name: Update feeds
+       if: steps.check_config.outputs.files_exists == 'true' && !cancelled()
        run: cd work && ./scripts/feeds update -a
      - name: Shell RUN
        if: env.AUTO_SH_RUN
