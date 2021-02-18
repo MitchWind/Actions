@@ -253,7 +253,7 @@ jobs:
        if: env.AUTO_SH_RUN && !cancelled()
        run: |
         [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}} ] && chmod +x ${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}}
-        cd work && ./${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}}
+        cd work && ../${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}}
      
      - name: Install feeds
        run: cd work && ./scripts/feeds install -a
