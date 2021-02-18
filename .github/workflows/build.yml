@@ -230,7 +230,7 @@ jobs:
         git clone $REPO_URL -b $REPO_BRANCH work
         ln -sf /${{matrix.work}}/work $GITHUB_WORKSPACE/work
      
-     - name: cp ${{matrix.arch}} Config
+     - name: Copy ${{matrix.arch}} Config
        if: steps.check_config.outputs.files_exists == 'true' && !cancelled()
        run: |
         [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}} ] && cp ${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}} work/feeds.conf.default
@@ -246,7 +246,15 @@ jobs:
        if: env.AUTO_SH_RUN
        run: |
         [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}} ] && chmox +x ${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}}
-        cd work && .${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}}
+        cd work && ./${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}}
+     - name: Install feeds
+       run: cd work && ./scripts/feeds install -a
+
+     - name: ${{matrix.arch}} status
+       run: |
+        cd work
+        git status
+        ls -lah work/feeds/
 
      
               
