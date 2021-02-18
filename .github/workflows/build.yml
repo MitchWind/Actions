@@ -249,8 +249,20 @@ jobs:
        run: |
         [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}} ] && chmod +x ${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}}
         cd work && ./${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}}
+     
      - name: Install feeds
        run: cd work && ./scripts/feeds install -a
+
+     - name: Download ${{matrix.work}} package
+       if: (!cancelled())
+       id: package
+       run: |
+        cd work
+        make defconfig
+        make download -j8
+        find dl -size -1024c -exec ls -l {} \;
+        find dl -size -1024c -exec rm -f {} \;
+
 
      - name: ${{matrix.arch}} status
        run: |
