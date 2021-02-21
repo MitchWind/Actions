@@ -283,9 +283,9 @@ jobs:
 
           grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
           [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
-          echo "环境变量${DEVICE_NAME}"
+          echo "${DEVICE_NAME}"
           echo "FIRMWARE=$PWD/bin/targets/${{matrix.arch}}/*" >> $GITHUB_ENV
-          echo "路径${FIRMWARE}"
+          echo "${FIRMWARE}"
 
       - name: Upload firmware to WeTransfer
         id: wetransfer
