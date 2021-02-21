@@ -251,7 +251,7 @@ jobs:
        run: cd work && ./scripts/feeds update -a
 
      - name: Shell RUN
-       if: env.AUTO_SH_RUN && !cancelled()
+       if: env.AUTO_SH_RUN && ${{ success() }}
        run: |
         [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}} ] && chmod +x ${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}}
         echo $PWD
@@ -261,7 +261,7 @@ jobs:
        run: cd work && ./scripts/feeds install -a
 
      - name: Download ${{matrix.work}} package
-       if: (!cancelled())
+       if: ${{ success() }}
        id: package
        run: |
         cd work
@@ -275,7 +275,7 @@ jobs:
        run: |
         cd work
         git status
-        ls -lah work/feeds/
+        ls -lah feeds/
 
      
               
