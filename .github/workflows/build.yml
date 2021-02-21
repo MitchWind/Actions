@@ -262,11 +262,11 @@ jobs:
           cd work && ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}}
 
       - name: Install feeds
-        if: env.IS_CONFIG_CONF == 'true'
+        if: ${{ success() }}
         run: cd work && ./scripts/feeds install -a
 
       - name: Download ${{matrix.work}} package
-        if: env.IS_CONFIG_CONF == 'true'
+        if: ${{ success() }}
         id: package
         run: |
           cd work
@@ -276,6 +276,7 @@ jobs:
           find dl -size -1024c -exec rm -f {} \;
 
       - name: ${{matrix.arch}} status
+        if: ${{ success() }}
         run: |
           cd work
           git status
