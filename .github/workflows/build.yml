@@ -223,14 +223,13 @@ jobs:
           source "${GITHUB_WORKSPACE}/${{matrix.work}}/settings.ini"
           echo "REPO_URL=${REPO_URL}" >> $GITHUB_ENV
           echo "REPO_BRANCH=${REPO_BRANCH}" >> $GITHUB_ENV
-          echo "UP_WETRANSFER=${UP_WETRANSFER}" >> $GITHUB_ENV
 
       - name: Clone ${{matrix.work}} source code
         if: env.IS_CONFIG_CONF == 'true'
         working-directory: /${{matrix.work}}
         run: |
           df -hT $PWD
-          git clone $REPO_URL work
+          git clone $REPO_URL -b $REPO_BRANCH work
           ln -sf /${{matrix.work}}/work $GITHUB_WORKSPACE/work
 
       - name: Copy ${{matrix.arch}} Config
