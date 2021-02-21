@@ -287,10 +287,11 @@ jobs:
           [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
           echo ${DEVICE_NAME}
           echo "FIRMWARE=$PWD/bin/targets/${{matrix.arch}}/*" >> $GITHUB_ENV
+          echo "${FIRMWARE}"
 
       - name: Upload firmware to WeTransfer
         id: wetransfer
-        if: env.UP_WETRANSFER && success()
+        if: env.UP_WETRANSFER =='true' && success()
         run: |
           curl -fsSL git.io/file-transfer | sh
           ./transfer wet -s -p 16 --no-progress ${FIRMWARE} 2>&1 | tee wetransfer.log
