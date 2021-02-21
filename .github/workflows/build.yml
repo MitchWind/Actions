@@ -208,7 +208,7 @@ jobs:
       - name: get value
         run: |
           echo "${{IS_CONFIG_CONF}}"
-          echo "${{env.IS_CONFIG_CONF}}"
+          
 
       #找到必要配置文件开始设置运行环境
       - name: Initialization
