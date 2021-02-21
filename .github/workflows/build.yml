@@ -205,7 +205,7 @@ jobs:
       - name: Set Config Status
         if: steps.check_config.outputs.files_exists == 'true'
         run: echo "IS_CONFIG_CONF=true" >> $GITHUB_ENV
-      
+
         #找到必要配置文件开始设置运行环境
       - name: Install Initialization
         if: env.IS_CONFIG_CONF == 'true'
@@ -220,13 +220,12 @@ jobs:
         run: |
           source "${GITHUB_WORKSPACE}/${{matrix.work}}/settings.ini"
           echo "REPO_URL=${REPO_URL}" >> $GITHUB_ENV
-          echo "REPO_BRANCH=${REPO_BRANCH}" >> $GITHUB_ENV        
+          echo "REPO_BRANCH=${REPO_BRANCH}" >> $GITHUB_ENV
 
       - name: Clone ${{matrix.work}} source code
         if: env.IS_CONFIG_CONF == 'true'
         working-directory: /${{matrix.work}}
         run: |
-          df -hT $PWD
           git clone $REPO_URL -b $REPO_BRANCH work
           ln -sf /${{matrix.work}}/work $GITHUB_WORKSPACE/work
 
@@ -268,7 +267,7 @@ jobs:
           find dl -size -1024c -exec rm -f {} \;
 
       - name: Comply Shell Run
-        if: env.IS_CONFIG_CONF == 'true'        
+        if: env.IS_CONFIG_CONF == 'true'
         run: |
           cd work
           git status
@@ -285,7 +284,7 @@ jobs:
           [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
           echo ${DEVICE_NAME}
           echo "FIRMWARE=$PWD/bin/targets/${{matrix.arch}}/*" >> $GITHUB_ENV
-          
+
       - name: Upload firmware to WeTransfer
         id: wetransfer
         if: env.UP_WETRANSFER && success()
@@ -303,4 +302,4 @@ jobs:
       - name: Delete workflow runs
         uses: Mattraks/delete-workflow-runs@main
         with:
-          retain_days: 1    
+          retain_days: 1
