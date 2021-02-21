@@ -213,7 +213,7 @@ jobs:
 
       #找到必要配置文件开始设置运行环境
       - name: Initialization
-        if: env.IS_CONFIG_CONF
+        if: env.IS_CONFIG_CONF == 'true'
         run: |
           echo "有配置文件继续后面流程"
           sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
@@ -226,14 +226,14 @@ jobs:
           sudo chown $USER:$GROUPS /${{matrix.work}}
 
       - name: Load ${{matrix.work}} Settings.ini
-        if: env.IS_CONFIG_CONF
+        if: env.IS_CONFIG_CONF == 'true'
         run: |
           source "${GITHUB_WORKSPACE}/${{matrix.work}}/settings.ini"
           echo "REPO_URL=${REPO_URL}" >> $GITHUB_ENV
           echo "REPO_BRANCH=${REPO_BRANCH}" >> $GITHUB_ENV
 
       - name: Clone ${{matrix.work}} source code
-        if: env.IS_CONFIG_CONF
+        if: env.IS_CONFIG_CONF == 'true'
         working-directory: /${{matrix.work}}
         run: |
           df -hT $PWD
@@ -241,7 +241,7 @@ jobs:
           ln -sf /${{matrix.work}}/work $GITHUB_WORKSPACE/work
 
       - name: Copy ${{matrix.arch}} Config
-        if: env.IS_CONFIG_CONF
+        if: env.IS_CONFIG_CONF == 'true'
         run: |
           [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}} ] && cp ${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}} work/feeds.conf.default
           [ -e ${{matrix.work}}/${{matrix.arch}}/.config ] && cp ${{matrix.work}}/${{matrix.arch}}/.config work/.config
@@ -251,22 +251,22 @@ jobs:
           cd work/ && git status
 
       - name: Update feeds
-        if: env.IS_CONFIG_CONF
+        if: env.IS_CONFIG_CONF == 'true'
         run: cd work && ./scripts/feeds update -a
 
       - name: Shell RUN
-        if: env.AUTO_SH_RUN && env.IS_CONFIG_CONF
+        if: env.AUTO_SH_RUN && env.IS_CONFIG_CONF == 'true'
         run: |
           [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}} ] && chmod +x ${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}}
           echo $PWD
           cd work && ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}}
 
       - name: Install feeds
-        if: env.IS_CONFIG_CONF
+        if: env.IS_CONFIG_CONF == 'true'
         run: cd work && ./scripts/feeds install -a
 
       - name: Download ${{matrix.work}} package
-        if: ${{ success() }}
+        if: env.IS_CONFIG_CONF == 'true'
         id: package
         run: |
           cd work
