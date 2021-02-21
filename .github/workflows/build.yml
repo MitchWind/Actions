@@ -262,7 +262,7 @@ jobs:
           cd work && ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}}
 
       - name: Install feeds
-        if: IS_CONFIG_CONF
+        if: env.IS_CONFIG_CONF
         run: cd work && ./scripts/feeds install -a
 
       - name: Download ${{matrix.work}} package
