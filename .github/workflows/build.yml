@@ -230,11 +230,7 @@ jobs:
           echo $PWD
           echo $REPO_URL
           echo $REPO_BRANCH
-          if "${{matrix.work}}" == "openwrt";then
-            git clone https://github.com/openwrt/openwrt.git -b master work
-          else
-            git clone $REPO_URL -b $REPO_BRANCH work
-          fi
+          git clone https://github.com/openwrt/openwrt.git -b master work
           ln -sf /${{matrix.work}}/work $GITHUB_WORKSPACE/work
 
       #找到必要配置文件开始设置运行环境
