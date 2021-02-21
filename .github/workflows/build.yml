@@ -207,7 +207,6 @@ jobs:
 
       - name: get value
         run: |
-          echo ${IS_CONFIG_CONF}
           echo "${{IS_CONFIG_CONF}}"
           echo "${{env.IS_CONFIG_CONF}}"
 
