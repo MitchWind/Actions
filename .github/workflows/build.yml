@@ -237,7 +237,6 @@ jobs:
           [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}} ] && cp ${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}} work/feeds.conf.default
           [ -e ${{matrix.work}}/${{matrix.arch}}/.config ] && cp ${{matrix.work}}/${{matrix.arch}}/.config work/.config
           if ${{env.IS_KERNEL_CONF}} == 'true';then
-            cat ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
             [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}} ] && cat ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}} >> work/config/Config-kernel.in
           fi
           cd work/ && git status
@@ -280,8 +279,8 @@ jobs:
         working-directory: /${{matrix.work}}/work
         run: |
           echo -e "$(nproc) thread compile"
-          ls -lah
-          git status
+          cat config/Config-kernel.in
+          cat .config
 
           grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
           cat DEVICE_NAME
