@@ -229,7 +229,7 @@ jobs:
         working-directory: /${{matrix.work}}
         run: |
           df -hT $PWD
-          git clone ${{REPO_URL}} -b ${{REPO_BRANCH}} work
+          git clone ${{env.REPO_URL}} -b ${{env.REPO_BRANCH}} work
           ln -sf /${{matrix.work}}/work $GITHUB_WORKSPACE/work
 
       - name: Copy ${{matrix.arch}} Config
