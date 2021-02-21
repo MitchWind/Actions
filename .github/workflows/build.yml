@@ -253,9 +253,10 @@ jobs:
 
       - name: Update feeds
         if: env.IS_CONFIG_CONF == 'true'
-        run: cd work && ./scripts/feeds update -a
+        working-directory: $GITHUB_WORKSPACE/work
+        run: ./scripts/feeds update -a
 
-      - name: Shell RUN
+      - name: Ready Shell RUN
         if: env.AUTO_SH_RUN && env.IS_CONFIG_CONF == 'true'
         run: |
           [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}} ] && chmod +x ${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}}
@@ -264,25 +265,35 @@ jobs:
 
       - name: Install feeds
         if: env.IS_CONFIG_CONF == 'true'
-        run: cd work && ./scripts/feeds install -a
+        working-directory: $GITHUB_WORKSPACE/work
+        run: ./scripts/feeds install -a
 
       - name: Download ${{matrix.work}} package
-        if: env.IS_CONFIG_CONF == 'true'        
+        if: env.IS_CONFIG_CONF == 'true'
+        working-directory: $GITHUB_WORKSPACE/work        
         id: package
         run: |
-          cd work
           make defconfig
           make download -j8
           find dl -size -1024c -exec ls -l {} \;
           find dl -size -1024c -exec rm -f {} \;
 
-      - name: ${{matrix.arch}} status
+      - name: Comply Shell Run
         if: env.IS_CONFIG_CONF == 'true'        
         run: |
           cd work
           git status
           ls -lah feeds/
-
+      - name: Make ${{matrix.work}} ${{matrix.arch}}
+        if: env.IS_CONFIG_CONF == 'true'
+        working-directory: $GITHUB_WORKSPACE/work
+        run: |
+          echo -e "$(nproc) thread compile"
+          grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
+          [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
+          echo ${DEVICE_NAME}
+          echo "FIRMWARE=$PWD/bin/targets/${{matrix.arch}}/*" >> $GITHUB_ENV
+          
       - name: Upload firmware to WeTransfer
         id: wetransfer
         if: env.UP_WETRANSFER
