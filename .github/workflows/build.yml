@@ -151,26 +151,6 @@ jobs:
             ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
           key: ${{matrix.work}}_${{matrix.arch}}_config
 
-  #  - name: Cache ${{matrix.work}} json
-  #    uses: jossef/action-set-json-field@v1
-  #    with:
-  #     file: default/work.json
-  #     field: ${{matrix.work}}
-  #     value: ${{steps.check_work.outputs.files_exists}}
-
-  #  - name: Cache ${{matrix.arch}} json
-  #    if:  steps.check_work.outputs.files_exists == 'true'
-  #    uses: jossef/action-set-json-field@v1
-  #    with:
-  #     file: default/work.json
-  #     field: openwrt.json
-  #     value: ${{steps.check_arch.outputs.files_exists}}
-
-  #  - name: 'Viem JSON'
-  #    if: ${{ success() }}
-  #    run: |
-  #     cat default/work.json
-
   Make:
     runs-on: ubuntu-latest
     name: Make ${{matrix.work}} ${{matrix.arch}}
@@ -272,12 +252,13 @@ jobs:
             [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}} ] && cat ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}} >> work/config/Config-kernel.in
           fi
           cd work/ && git status
+          
       - name: "Upload Artifact"
         uses: actions/upload-artifact@v2
         with:
-          name: ${{matrix.work}}_${{matrix.arch}}_config
+          name: workconfig
           path: |
-            work/.config 
+            work/.config
             work/config/Config-kernel.in
             
       - name: Make ${{matrix.work}} ${{matrix.arch}}
