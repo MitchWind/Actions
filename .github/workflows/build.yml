@@ -211,10 +211,7 @@ jobs:
         run: |
           echo "有配置文件继续后面流程"
           sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
-          sudo -E apt-get -qq update
-          sudo -E apt-get -qq install $(curl -fsSL git.io/depends-ubuntu-1804)
-          sudo -E apt-get -qq autoremove --purge
-          sudo -E apt-get -qq clean
+          
           sudo timedatectl set-timezone "Asia/Shanghai"
           sudo mkdir -p /${{matrix.work}}
           sudo chown $USER:$GROUPS /${{matrix.work}}
@@ -232,7 +229,7 @@ jobs:
         working-directory: /${{matrix.work}}
         run: |
           df -hT $PWD
-          git clone $REPO_URL -b $REPO_BRANCH work
+          git clone ${{REPO_URL}} -b ${{REPO_BRANCH}} work
           ln -sf /${{matrix.work}}/work $GITHUB_WORKSPACE/work
 
       - name: Copy ${{matrix.arch}} Config
