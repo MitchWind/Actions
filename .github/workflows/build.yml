@@ -258,15 +258,14 @@ jobs:
         if: env.AUTO_SH_RUN && env.IS_CONFIG_CONF == 'true'
         run: |
           [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}} ] && chmod +x ${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}}
-          echo $PWD
-          cd work && ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}}
+          cd work && ls -lah
+          ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}}
 
       - name: Install feeds
-        if: ${{ success() }}
+        if: ${{ !cancelled() }}
         run: cd work && ./scripts/feeds install -a
 
-      - name: Download ${{matrix.work}} package
-        if: ${{ success() }}
+      - name: Download ${{matrix.work}} package        
         id: package
         run: |
           cd work
@@ -275,8 +274,7 @@ jobs:
           find dl -size -1024c -exec ls -l {} \;
           find dl -size -1024c -exec rm -f {} \;
 
-      - name: ${{matrix.arch}} status
-        if: ${{ success() }}
+      - name: ${{matrix.arch}} status        
         run: |
           cd work
           git status
