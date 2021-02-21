@@ -218,7 +218,7 @@ jobs:
       - name: Load ${{matrix.work}} Settings.ini
         if: env.IS_CONFIG_CONF == 'true'
         run: |
-          source "${GITHUB_WORKSPACE}/${{matrix.work}}/settings.ini"
+          source "${GITHUB_WORKSPACE}/${{matrix.work}}/.env"
           echo "REPO_URL=${REPO_URL}" >> $GITHUB_ENV
           echo "REPO_BRANCH=${REPO_BRANCH}" >> $GITHUB_ENV
 
