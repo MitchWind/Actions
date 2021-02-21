@@ -255,7 +255,7 @@ jobs:
         run: cd work && ./scripts/feeds update -a
 
       - name: Shell RUN
-        if: env.AUTO_SH_RUN && steps.check_config.outputs.files_exists == 'true'
+        if: env.AUTO_SH_RUN && env.IS_CONFIG_CONF
         run: |
           [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}} ] && chmod +x ${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}}
           echo $PWD
