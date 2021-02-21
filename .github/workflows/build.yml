@@ -251,16 +251,16 @@ jobs:
           if ${{env.IS_KERNEL_CONF}} == 'true';then
             [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}} ] && cat ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}} >> work/config/Config-kernel.in
           fi
-          ls -lah
+          ls  /${{matrix.work}}/work -lah 
           cd work/ && git status
           
       - name: "Upload Artifact"
         uses: actions/upload-artifact@v2
         with:
-          name: workconfig
+          name: ${{matrix.work}}workconfig
           path: |
-            work/.config
-            work/config/Config-kernel.in
+            /${{matrix.work}}/work/.config
+            /${{matrix.work}}/work/config/Config-kernel.in
             
       - name: Make ${{matrix.work}} ${{matrix.arch}}
         if: env.IS_CONFIG_CONF == 'true'
