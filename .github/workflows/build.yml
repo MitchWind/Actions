@@ -226,8 +226,8 @@ jobs:
         if: env.IS_CONFIG_CONF == 'true'
         working-directory: /${{matrix.work}}
         run: |
-          echo "git clone -b $REPO_BRANCH $REPO_URL work"
-          git clone -b $REPO_BRANCH $REPO_URL work
+          echo "git clone -b ${REPO_BRANCH} ${REPO_URL} work"
+          git clone -b ${REPO_BRANCH} ${REPO_URL} work
           ln -sf /${{matrix.work}}/work $GITHUB_WORKSPACE/work
 
       - name: Copy ${{matrix.arch}} Config
