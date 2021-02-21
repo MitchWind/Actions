@@ -185,7 +185,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@main
 
-      - uses: actions/download-artifact@v2
+      - name: Download Artifact
+        uses: actions/download-artifact@v2
         with:
           name: ${{matrix.work}}_${{matrix.arch}}_config
 
@@ -229,7 +230,7 @@ jobs:
         working-directory: /${{matrix.work}}
         run: |
           df -hT $PWD
-          git clone ${{env.REPO_URL}} -b ${{env.REPO_BRANCH}} work
+          git clone $REPO_URL work
           ln -sf /${{matrix.work}}/work $GITHUB_WORKSPACE/work
 
       - name: Copy ${{matrix.arch}} Config
