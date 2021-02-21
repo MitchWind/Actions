@@ -231,6 +231,7 @@ jobs:
           source "${GITHUB_WORKSPACE}/${{matrix.work}}/settings.ini"
           echo "REPO_URL=${REPO_URL}" >> $GITHUB_ENV
           echo "REPO_BRANCH=${REPO_BRANCH}" >> $GITHUB_ENV
+          echo "UP_WETRANSFER=${UP_WETRANSFER}" >> $GITHUB_ENV
 
       - name: Clone ${{matrix.work}} source code
         if: env.IS_CONFIG_CONF == 'true'
@@ -262,10 +263,11 @@ jobs:
           ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}}
 
       - name: Install feeds
-        if: ${{ !cancelled() }}
+        if: env.IS_CONFIG_CONF == 'true'
         run: cd work && ./scripts/feeds install -a
 
-      - name: Download ${{matrix.work}} package        
+      - name: Download ${{matrix.work}} package
+        if: env.IS_CONFIG_CONF == 'true'        
         id: package
         run: |
           cd work
@@ -274,8 +276,18 @@ jobs:
           find dl -size -1024c -exec ls -l {} \;
           find dl -size -1024c -exec rm -f {} \;
 
-      - name: ${{matrix.arch}} status        
+      - name: ${{matrix.arch}} status
+        if: env.IS_CONFIG_CONF == 'true'        
         run: |
           cd work
           git status
           ls -lah feeds/
+
+      - name: Upload firmware to WeTransfer
+        id: wetransfer
+        if: env.UP_WETRANSFER
+        run: |
+          curl -fsSL git.io/file-transfer | sh
+          ./transfer wet -s -p 16 --no-progress ${FIRMWARE} 2>&1 | tee wetransfer.log
+          echo "::warning file=wetransfer.com::$(cat wetransfer.log | grep https)"
+          echo "::set-output name=url::$(cat wetransfer.log | grep https | cut -f3 -d" ")"    
