@@ -237,6 +237,7 @@ jobs:
           [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}} ] && cp ${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}} work/feeds.conf.default
           [ -e ${{matrix.work}}/${{matrix.arch}}/.config ] && cp ${{matrix.work}}/${{matrix.arch}}/.config work/.config
           if ${{env.IS_KERNEL_CONF}} == 'true';then
+            cat ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
             [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}} ] && cat ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}} >> work/config/Config-kernel.in
           fi
           cd work/ && git status
@@ -244,16 +245,14 @@ jobs:
       - name: Update feeds
         if: env.IS_CONFIG_CONF == 'true'
         working-directory: /${{matrix.work}}/work
-        run: echo $PWD && ./scripts/feeds update -a
+        run: ./scripts/feeds update -a
 
       - name: Ready Shell RUN
         if: env.AUTO_SH_RUN && env.IS_CONFIG_CONF == 'true'
         run: |
           [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}} ] && chmod +x ${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}}
-          cd work
-          ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}}
-         
-
+          cd work && ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}}
+          
       - name: Install feeds
         if: env.IS_CONFIG_CONF == 'true'
         working-directory: /${{matrix.work}}/work
