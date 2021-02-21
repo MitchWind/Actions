@@ -207,7 +207,7 @@ jobs:
 
       - name: Initialization4
         run: |
-          echo "${{IS_CONFIG_CONF}}"
+          echo "${IS_CONFIG_CONF}"
           
 
       #找到必要配置文件开始设置运行环境
