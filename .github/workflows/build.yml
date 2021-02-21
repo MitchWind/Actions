@@ -1,30 +1,30 @@
 name: Build
 
 on:
- push:
- workflow_dispatch:
+  push:
+  workflow_dispatch:
     inputs:
       ssh:
-        description: 'SSH connection to Actions'
+        description: "SSH connection to Actions"
         required: true
-        default: 'true'
+        default: "true"
 
 env:
-#默认软件包
+  #默认软件包
   FEEDS_CONF: feeds.conf.default
-#默认配置文件名
+  #默认配置文件名
   CONFIG_CONF: config.seed
-#默认内核配置
+  #默认内核配置
   KERNEL_CONF: kconfig.seed
-#默认内核宏文件名
+  #默认内核宏文件名
   KERNEL_IN: kConfig.in
-#是否开启内容合并
+  #是否开启内容合并
   CONF_ISMERGE: true
-#是否自动生成内核宏
+  #是否自动生成内核宏
   KERNEL_ISMERAGE: true
-#是否开启内核文件注入到配置
+  #是否开启内核文件注入到配置
   IS_KERNEL_CONF: true
-#配置文件是否存在
+  #配置文件是否存在
   IS_CONFIG_CONF: false
 
   AUTO_SH_FILE1: "confingbefore.sh"
@@ -36,123 +36,121 @@ defaults:
     shell: bash
 
 jobs:
-  verify :
-   runs-on: ubuntu-latest
-   name: File Verify ${{matrix.work}} ${{matrix.arch}}
-   strategy:
-    fail-fast: false
-    matrix:
-     work: [openwrt,lienol,lede]
-     arch: [x86]
-   outputs:
-    isWork: '{"include":["openwrt":${{env.isopenwrt}},"lede":${{env.islede}},"lienol":${{env.islienol}}]}'
-   steps:
-   - name: Checkout
-     uses: actions/checkout@main
-      
-   - name: Check work ${{matrix.work}}
-     id: check_work
-     uses: andstor/file-existence-action@v1.0.1
-     with:
-      files: "${{matrix.work}}"
+  verify:
+    runs-on: ubuntu-latest
+    name: File Verify ${{matrix.work}} ${{matrix.arch}}
+    strategy:
+      fail-fast: false
+      matrix:
+        work: [openwrt, lienol, lede]
+        arch: [x86]
+    outputs:
+      isWork: '{"include":["openwrt":${{env.isopenwrt}},"lede":${{env.islede}},"lienol":${{env.islienol}}]}'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@main
 
-   - name: Check ${{matrix.work}} Arch ${{matrix.arch}}
-     id: check_arch
-     if: steps.check_work.outputs.files_exists == 'true'
-     uses: andstor/file-existence-action@v1.0.1
-     with:
-      files: "${{matrix.work}}/${{matrix.arch}}"
+      - name: Check work ${{matrix.work}}
+        id: check_work
+        uses: andstor/file-existence-action@v1.0.1
+        with:
+          files: "${{matrix.work}}"
 
-   - name: Check ${{matrix.work}} Arch ${{matrix.arch}} Config
-     id: check_config
-     if: steps.check_arch.outputs.files_exists == 'true'
-     uses: andstor/file-existence-action@v1.0.1
-     with:
-      files: "${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}}, ${{matrix.work}}/${{matrix.arch}}/${{env.CONFIG_CONF}}"
-    
-   
-   - name: Make Config
-     if: steps.check_config.outputs.files_exists == 'true'
-     run: |
-      if ${{env.CONF_ISMERGE}} ;then
-        if [ -f ${GITHUB_WORKSPACE}/default/${{matrix.arch}}/default.seed ] ;then
-          cat ${GITHUB_WORKSPACE}/default/${{matrix.arch}}/default.seed >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.config          
-        fi
-        #默认所有架构都需要安装的包
-        if [ -f ${GITHUB_WORKSPACE}/default/default.seed ] ;then
-          cat ${GITHUB_WORKSPACE}/default/default.seed >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.config          
-        fi
-      fi
-      cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.CONFIG_CONF}} >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.config  
-      
+      - name: Check ${{matrix.work}} Arch ${{matrix.arch}}
+        id: check_arch
+        if: steps.check_work.outputs.files_exists == 'true'
+        uses: andstor/file-existence-action@v1.0.1
+        with:
+          files: "${{matrix.work}}/${{matrix.arch}}"
 
-   - name: Make Kernel
-     id: kernel
-     if:  steps.check_config.outputs.files_exists == 'true' && (env.IS_KERNEL_CONF == 'true' && env.IS_KERNEL_CONF != 'false')
-     run: |
-      #默认
-      if [ -f ${GITHUB_WORKSPACE}/default/${{env.KERNEL_CONF}} ];then 
-          cat ${GITHUB_WORKSPACE}/default/${{env.KERNEL_CONF}} >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig
-      fi
-      if [ -f ${GITHUB_WORKSPACE}/default/${{env.KERNEL_IN}} ];then 
-          cat ${GITHUB_WORKSPACE}/default/${{env.KERNEL_IN}} >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in
-      fi
-      #默认指定架构
-      if [ -f ${GITHUB_WORKSPACE}/default/${{matrix.arch}}/${{env.KERNEL_CONF}} ];then 
-          cat ${GITHUB_WORKSPACE}/default/${{matrix.arch}}/${{env.KERNEL_CONF}} >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig
-      fi
-      if [ -f ${GITHUB_WORKSPACE}/default/${{matrix.arch}}/${{env.KERNEL_IN}} ];then 
-          cat ${GITHUB_WORKSPACE}/default/${{matrix.arch}}/${{env.KERNEL_IN}} >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in
-      fi
+      - name: Check ${{matrix.work}} Arch ${{matrix.arch}} Config
+        id: check_config
+        if: steps.check_arch.outputs.files_exists == 'true'
+        uses: andstor/file-existence-action@v1.0.1
+        with:
+          files: "${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}}, ${{matrix.work}}/${{matrix.arch}}/${{env.CONFIG_CONF}}"
 
-      #指定架构
-      if [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_CONF}} ];then 
-          cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_CONF}} >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig
-      fi
-      if [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}} ];then 
-          cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}} >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in          
-      fi
-      cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.config
-      cp ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
-   - name: Start SSH via tmate
-     uses: P3TERX/ssh2actions@main
-     if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
-     env:
-        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      - name: Make Config
+        if: steps.check_config.outputs.files_exists == 'true'
+        run: |
+          if ${{env.CONF_ISMERGE}} ;then
+            if [ -f ${GITHUB_WORKSPACE}/default/${{matrix.arch}}/default.seed ] ;then
+              cat ${GITHUB_WORKSPACE}/default/${{matrix.arch}}/default.seed >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.config          
+            fi
+            #默认所有架构都需要安装的包
+            if [ -f ${GITHUB_WORKSPACE}/default/default.seed ] ;then
+              cat ${GITHUB_WORKSPACE}/default/default.seed >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.config          
+            fi
+          fi
+          cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.CONFIG_CONF}} >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.config
 
-   - name: Auto ${{matrix.arch}} Kernel in
-     if:  steps.check_config.outputs.files_exists == 'true' && (env.IS_KERNEL_CONF == 'true' && env.IS_KERNEL_CONF != 'false') && env.KERNEL_ISMERAGE == 'true'
-     run: |
-      [ -e default/kernel.sh ] && chmod +x default/kernel.sh
-      echo 'kernel'
-      rm -rf ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
-      ./default/kernel.sh ${{matrix.work}}/${{matrix.arch}}/.kConfig ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
+      - name: Make Kernel
+        id: kernel
+        if: steps.check_config.outputs.files_exists == 'true' && (env.IS_KERNEL_CONF == 'true' && env.IS_KERNEL_CONF != 'false')
+        run: |
+          #默认
+          if [ -f ${GITHUB_WORKSPACE}/default/${{env.KERNEL_CONF}} ];then 
+              cat ${GITHUB_WORKSPACE}/default/${{env.KERNEL_CONF}} >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig
+          fi
+          if [ -f ${GITHUB_WORKSPACE}/default/${{env.KERNEL_IN}} ];then 
+              cat ${GITHUB_WORKSPACE}/default/${{env.KERNEL_IN}} >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in
+          fi
+          #默认指定架构
+          if [ -f ${GITHUB_WORKSPACE}/default/${{matrix.arch}}/${{env.KERNEL_CONF}} ];then 
+              cat ${GITHUB_WORKSPACE}/default/${{matrix.arch}}/${{env.KERNEL_CONF}} >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig
+          fi
+          if [ -f ${GITHUB_WORKSPACE}/default/${{matrix.arch}}/${{env.KERNEL_IN}} ];then 
+              cat ${GITHUB_WORKSPACE}/default/${{matrix.arch}}/${{env.KERNEL_IN}} >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in
+          fi
 
-   - name: 'Upload Artifact'
-     
-     uses: actions/upload-artifact@v2
-     with:
-      name: ${{matrix.work}}_${{matrix.arch}}_config
-      path: |
-       default/default.sh
-       ${{matrix.work}}/${{matrix.arch}}/.config 
-       ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
+          #指定架构
+          if [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_CONF}} ];then 
+              cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_CONF}} >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig
+          fi
+          if [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}} ];then 
+              cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}} >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in          
+          fi
+          cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.config
+          cp ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
+      - name: Start SSH via tmate
+        uses: P3TERX/ssh2actions@main
+        if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
 
-   - name: Make ls
-     if: steps.check_config.outputs.files_exists == 'true'
-     run: |
-      [ -d ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/ ] && ls -lah ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/
-      [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig ] && cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig
-      [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in ] && cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in
-   - name: Cache Config
-     if: steps.check_config.outputs.files_exists == 'true'
-     uses: actions/cache@v2
-     with:
-      path: |
-       ${{matrix.work}}/${{matrix.arch}}/.config 
-       ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
-      key: ${{matrix.work}}_${{matrix.arch}}_config
+      - name: Auto ${{matrix.arch}} Kernel in
+        if: steps.check_config.outputs.files_exists == 'true' && (env.IS_KERNEL_CONF == 'true' && env.IS_KERNEL_CONF != 'false') && env.KERNEL_ISMERAGE == 'true'
+        run: |
+          [ -e default/kernel.sh ] && chmod +x default/kernel.sh
+          echo 'kernel'
+          rm -rf ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
+          ./default/kernel.sh ${{matrix.work}}/${{matrix.arch}}/.kConfig ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
+
+      - name: "Upload Artifact"
+
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{matrix.work}}_${{matrix.arch}}_config
+          path: |
+            default/default.sh
+            ${{matrix.work}}/${{matrix.arch}}/.config 
+            ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
+
+      - name: Make ls
+        if: steps.check_config.outputs.files_exists == 'true'
+        run: |
+          [ -d ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/ ] && ls -lah ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/
+          [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig ] && cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig
+          [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in ] && cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in
+      - name: Cache Config
+        if: steps.check_config.outputs.files_exists == 'true'
+        uses: actions/cache@v2
+        with:
+          path: |
+            ${{matrix.work}}/${{matrix.arch}}/.config 
+            ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
+          key: ${{matrix.work}}_${{matrix.arch}}_config
 
   #  - name: Cache ${{matrix.work}} json
   #    uses: jossef/action-set-json-field@v1
@@ -172,113 +170,114 @@ jobs:
   #  - name: 'Viem JSON'
   #    if: ${{ success() }}
   #    run: |
-  #     cat default/work.json     
+  #     cat default/work.json
 
-  Make :
-   runs-on: ubuntu-latest
-   name: Make ${{matrix.work}} ${{matrix.arch}}   
-   needs: verify   
-   strategy:
-    fail-fast: false
-    matrix:
-     work: [openwrt,lienol,lede]
-     arch: [x86]
-   steps:
-     - name: Checkout
-       uses: actions/checkout@main
+  Make:
+    runs-on: ubuntu-latest
+    name: Make ${{matrix.work}} ${{matrix.arch}}
+    needs: verify
+    strategy:
+      fail-fast: false
+      matrix:
+        work: [openwrt, lienol, lede]
+        arch: [x86]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@main
 
-     - uses: actions/download-artifact@v2
-       with:
-         name: ${{matrix.work}}_${{matrix.arch}}_config
+      - uses: actions/download-artifact@v2
+        with:
+          name: ${{matrix.work}}_${{matrix.arch}}_config
 
-     #删除工作件   
-     - name: Delete Artifact
-       uses: geekyeggo/delete-artifact@v1
-       with:
-        name: ${{matrix.work}}_${{matrix.arch}}_config
-        failOnError: false
-#验证必要的配置文件是否存在
-     - name: Check ${{matrix.work}} ${{matrix.arch}} Config
-       id: check_config
-       uses: andstor/file-existence-action@v1.0.1
-       with:
-         files: "${{matrix.work}}, ${{matrix.work}}/${{matrix.arch}}, ${{matrix.work}}/${{matrix.arch}}/.config,${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}}"
-     - name: Set Config Status
-       if: steps.check_config.outputs.files_exists == 'true'
-       run: echo "IS_CONFIG_CONF=true" >> $GITHUB_ENV
-    #找到必要配置文件开始设置运行环境
-     - name: Initialization 
-       if: steps.check_config.outputs.files_exists == 'true'
-       run: |
-         echo ${IS_CONFIG_CONF}
-         echo "有配置文件继续后面流程"
-         sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
-         sudo -E apt-get -qq update
-         sudo -E apt-get -qq install $(curl -fsSL git.io/depends-ubuntu-1804)
-         sudo -E apt-get -qq autoremove --purge
-         sudo -E apt-get -qq clean
-         sudo timedatectl set-timezone "Asia/Shanghai"
-         sudo mkdir -p /${{matrix.work}}
-         sudo chown $USER:$GROUPS /${{matrix.work}}
+      #删除工作件
+      - name: Delete Artifact
+        uses: geekyeggo/delete-artifact@v1
+        with:
+          name: ${{matrix.work}}_${{matrix.arch}}_config
+          failOnError: false
+      #验证必要的配置文件是否存在
+      - name: Check ${{matrix.work}} ${{matrix.arch}} Config
+        id: check_config
+        uses: andstor/file-existence-action@v1.0.1
+        with:
+          files: "${{matrix.work}}, ${{matrix.work}}/${{matrix.arch}}, ${{matrix.work}}/${{matrix.arch}}/.config,${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}}"
+      - name: Set Config Status
+        if: steps.check_config.outputs.files_exists == 'true'
+        run: echo "IS_CONFIG_CONF=true" >> $GITHUB_ENV
+      - name: get value
+        run: echo "${{IS_CONFIG_CONF}}"
 
-     - name: Load ${{matrix.work}} Settings.ini
-       if:  steps.check_config.outputs.files_exists == 'true' && !cancelled()
-       run: |
-        source "${GITHUB_WORKSPACE}/${{matrix.work}}/settings.ini"
-        echo "REPO_URL=${REPO_URL}" >> $GITHUB_ENV
-        echo "REPO_BRANCH=${REPO_BRANCH}" >> $GITHUB_ENV
+      - name: get value
+        run: |
+          echo ${IS_CONFIG_CONF}
+          echo "${{IS_CONFIG_CONF}}"
+          echo "${{env.IS_CONFIG_CONF}}"
 
-     - name:  Clone ${{matrix.work}} source code
-       if: steps.check_config.outputs.files_exists == 'true' && !cancelled()
-       working-directory: /${{matrix.work}}
-       run: |
-        df -hT $PWD
-        git clone $REPO_URL -b $REPO_BRANCH work
-        ln -sf /${{matrix.work}}/work $GITHUB_WORKSPACE/work
-     
-     - name: Copy ${{matrix.arch}} Config
-       if: steps.check_config.outputs.files_exists == 'true' && !cancelled()
-       run: |
-        [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}} ] && cp ${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}} work/feeds.conf.default
-        [ -e ${{matrix.work}}/${{matrix.arch}}/.config ] && cp ${{matrix.work}}/${{matrix.arch}}/.config work/.config
-        if ${{env.IS_KERNEL_CONF}} == 'true';then
-          [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}} ] && cat ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}} >> work/config/Config-kernel.in
-        fi
-        cd work/ && git status
+      #找到必要配置文件开始设置运行环境
+      - name: Initialization
+        if: steps.check_config.outputs.files_exists == 'true'
+        run: |
+          echo "有配置文件继续后面流程"
+          sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
+          sudo -E apt-get -qq update
+          sudo -E apt-get -qq install $(curl -fsSL git.io/depends-ubuntu-1804)
+          sudo -E apt-get -qq autoremove --purge
+          sudo -E apt-get -qq clean
+          sudo timedatectl set-timezone "Asia/Shanghai"
+          sudo mkdir -p /${{matrix.work}}
+          sudo chown $USER:$GROUPS /${{matrix.work}}
 
-     - name: Update feeds
-       if: steps.check_config.outputs.files_exists == 'true' && !cancelled()
-       run: cd work && ./scripts/feeds update -a
+      - name: Load ${{matrix.work}} Settings.ini
+        if: steps.check_config.outputs.files_exists == 'true' && !cancelled()
+        run: |
+          source "${GITHUB_WORKSPACE}/${{matrix.work}}/settings.ini"
+          echo "REPO_URL=${REPO_URL}" >> $GITHUB_ENV
+          echo "REPO_BRANCH=${REPO_BRANCH}" >> $GITHUB_ENV
 
-     - name: Shell RUN
-       if: env.AUTO_SH_RUN && ${{ success() }}
-       run: |
-        [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}} ] && chmod +x ${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}}
-        echo $PWD
-        cd work && ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}}
-     
-     - name: Install feeds
-       run: cd work && ./scripts/feeds install -a
+      - name: Clone ${{matrix.work}} source code
+        if: steps.check_config.outputs.files_exists == 'true' && !cancelled()
+        working-directory: /${{matrix.work}}
+        run: |
+          df -hT $PWD
+          git clone $REPO_URL -b $REPO_BRANCH work
+          ln -sf /${{matrix.work}}/work $GITHUB_WORKSPACE/work
 
-     - name: Download ${{matrix.work}} package
-       if: ${{ success() }}
-       id: package
-       run: |
-        cd work
-        make defconfig
-        make download -j8
-        find dl -size -1024c -exec ls -l {} \;
-        find dl -size -1024c -exec rm -f {} \;
+      - name: Copy ${{matrix.arch}} Config
+        if: steps.check_config.outputs.files_exists == 'true' && !cancelled()
+        run: |
+          [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}} ] && cp ${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}} work/feeds.conf.default
+          [ -e ${{matrix.work}}/${{matrix.arch}}/.config ] && cp ${{matrix.work}}/${{matrix.arch}}/.config work/.config
+          if ${{env.IS_KERNEL_CONF}} == 'true';then
+            [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}} ] && cat ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}} >> work/config/Config-kernel.in
+          fi
+          cd work/ && git status
 
+      - name: Update feeds
+        if: steps.check_config.outputs.files_exists == 'true' && !cancelled()
+        run: cd work && ./scripts/feeds update -a
 
-     - name: ${{matrix.arch}} status
-       run: |
-        cd work
-        git status
-        ls -lah feeds/
+      - name: Shell RUN
+        if: env.AUTO_SH_RUN && steps.check_config.outputs.files_exists == 'true'
+        run: |
+          [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}} ] && chmod +x ${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}}
+          echo $PWD
+          cd work && ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}}
 
-     
-              
-  
+      - name: Install feeds
+        run: cd work && ./scripts/feeds install -a
 
+      - name: Download ${{matrix.work}} package
+        if: ${{ success() }}
+        id: package
+        run: |
+          cd work
+          make defconfig
+          make download -j8
+          find dl -size -1024c -exec ls -l {} \;
+          find dl -size -1024c -exec rm -f {} \;
 
+      - name: ${{matrix.arch}} status
+        run: |
+          cd work
+          git status
+          ls -lah feeds/
