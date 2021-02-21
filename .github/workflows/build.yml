@@ -213,7 +213,7 @@ jobs:
 
       #找到必要配置文件开始设置运行环境
       - name: Initialization
-        if: steps.check_config.outputs.files_exists == 'true'
+        if: env.IS_CONFIG_CONF
         run: |
           echo "有配置文件继续后面流程"
           sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
@@ -226,14 +226,14 @@ jobs:
           sudo chown $USER:$GROUPS /${{matrix.work}}
 
       - name: Load ${{matrix.work}} Settings.ini
-        if: steps.check_config.outputs.files_exists == 'true' && !cancelled()
+        if: env.IS_CONFIG_CONF
         run: |
           source "${GITHUB_WORKSPACE}/${{matrix.work}}/settings.ini"
           echo "REPO_URL=${REPO_URL}" >> $GITHUB_ENV
           echo "REPO_BRANCH=${REPO_BRANCH}" >> $GITHUB_ENV
 
       - name: Clone ${{matrix.work}} source code
-        if: steps.check_config.outputs.files_exists == 'true' && !cancelled()
+        if: env.IS_CONFIG_CONF
         working-directory: /${{matrix.work}}
         run: |
           df -hT $PWD
@@ -241,7 +241,7 @@ jobs:
           ln -sf /${{matrix.work}}/work $GITHUB_WORKSPACE/work
 
       - name: Copy ${{matrix.arch}} Config
-        if: steps.check_config.outputs.files_exists == 'true' && !cancelled()
+        if: env.IS_CONFIG_CONF
         run: |
           [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}} ] && cp ${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}} work/feeds.conf.default
           [ -e ${{matrix.work}}/${{matrix.arch}}/.config ] && cp ${{matrix.work}}/${{matrix.arch}}/.config work/.config
@@ -251,7 +251,7 @@ jobs:
           cd work/ && git status
 
       - name: Update feeds
-        if: steps.check_config.outputs.files_exists == 'true' && !cancelled()
+        if: env.IS_CONFIG_CONF
         run: cd work && ./scripts/feeds update -a
 
       - name: Shell RUN
