@@ -128,7 +128,6 @@ jobs:
           ./default/kernel.sh ${{matrix.work}}/${{matrix.arch}}/.kConfig ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
 
       - name: "Upload Artifact"
-
         uses: actions/upload-artifact@v2
         with:
           name: ${{matrix.work}}_${{matrix.arch}}_config
@@ -273,19 +272,20 @@ jobs:
             [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}} ] && cat ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}} >> work/config/Config-kernel.in
           fi
           cd work/ && git status
-          
+      - name: "Upload Artifact"
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{matrix.work}}_${{matrix.arch}}_config
+          path: |
+            work/.config 
+            work/config/Config-kernel.in
+            
       - name: Make ${{matrix.work}} ${{matrix.arch}}
         if: env.IS_CONFIG_CONF == 'true'
         id: make
         working-directory: /${{matrix.work}}/work
         run: |
-          echo -e "$(nproc) thread compile"
-
-          grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
-          [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
-          echo "${DEVICE_NAME}"
-          echo "FIRMWARE=$PWD/bin/targets/${{matrix.arch}}/*" >> $GITHUB_ENV
-          echo "${FIRMWARE}"
+          echo -e "$(nproc) thread compile"          
 
       - name: Upload firmware to WeTransfer
         id: wetransfer
