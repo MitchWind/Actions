@@ -218,7 +218,7 @@ jobs:
           sudo timedatectl set-timezone "Asia/Shanghai"
           sudo mkdir -p /${{matrix.work}}
           sudo chown $USER:$GROUPS /${{matrix.work}}
-          
+
       - name: Load ${{matrix.work}} Settings.ini
         if: env.IS_CONFIG_CONF == 'true'
         run: |
@@ -232,9 +232,6 @@ jobs:
         working-directory: /${{matrix.work}}
         run: |
           df -hT $PWD
-          echo $PWD
-          echo $REPO_URL
-          echo $REPO_BRANCH
           git clone $REPO_URL -b $REPO_BRANCH work
           ln -sf /${{matrix.work}}/work $GITHUB_WORKSPACE/work
 
@@ -251,7 +248,7 @@ jobs:
       - name: Update feeds
         if: env.IS_CONFIG_CONF == 'true'
         working-directory: $GITHUB_WORKSPACE/work
-        run: ./scripts/feeds update -a
+        run: echo $PWD && ./scripts/feeds update -a
 
       - name: Ready Shell RUN
         if: env.AUTO_SH_RUN && env.IS_CONFIG_CONF == 'true'
