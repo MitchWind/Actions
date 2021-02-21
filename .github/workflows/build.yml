@@ -204,8 +204,6 @@ jobs:
       - name: Set Config Status
         if: steps.check_config.outputs.files_exists == 'true'
         run: echo "IS_CONFIG_CONF=true" >> $GITHUB_ENV
-      - name: get value
-        run: echo "${{IS_CONFIG_CONF}}"
 
       - name: get value
         run: |
