@@ -209,25 +209,14 @@ jobs:
         run: |
           echo "${IS_CONFIG_CONF}"
           echo "${{env.IS_CONFIG_CONF}}"
-          
-
-      #找到必要配置文件开始设置运行环境
-      - name: Initialization
-        if: env.IS_CONFIG_CONF == 'true'
-        run: |
-          echo "有配置文件继续后面流程"
-          sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
-          sudo -E apt-get -qq update
-          sudo -E apt-get -qq install $(curl -fsSL git.io/depends-ubuntu-1804)
-          sudo -E apt-get -qq autoremove --purge
-          sudo -E apt-get -qq clean
-          sudo timedatectl set-timezone "Asia/Shanghai"
-          sudo mkdir -p /${{matrix.work}}
-          sudo chown $USER:$GROUPS /${{matrix.work}}
 
       - name: Load ${{matrix.work}} Settings.ini
         if: env.IS_CONFIG_CONF == 'true'
         run: |
+          sudo timedatectl set-timezone "Asia/Shanghai"
+          sudo mkdir -p /${{matrix.work}}
+          sudo chown $USER:$GROUPS /${{matrix.work}}
+
           source "${GITHUB_WORKSPACE}/${{matrix.work}}/settings.ini"
           echo "REPO_URL=${REPO_URL}" >> $GITHUB_ENV
           echo "REPO_BRANCH=${REPO_BRANCH}" >> $GITHUB_ENV
@@ -243,6 +232,17 @@ jobs:
           git clone $REPO_URL -b $REPO_BRANCH work
           ln -sf /${{matrix.work}}/work $GITHUB_WORKSPACE/work
 
+      #找到必要配置文件开始设置运行环境
+      - name: Install Initialization
+        if: env.IS_CONFIG_CONF == 'true'
+        run: |
+          echo "有配置文件继续后面流程"
+          sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
+          sudo -E apt-get -qq update
+          sudo -E apt-get -qq install $(curl -fsSL git.io/depends-ubuntu-1804)
+          sudo -E apt-get -qq autoremove --purge
+          sudo -E apt-get -qq clean
+          
       - name: Copy ${{matrix.arch}} Config
         if: env.IS_CONFIG_CONF == 'true'
         run: |
