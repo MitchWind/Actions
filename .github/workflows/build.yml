@@ -231,16 +231,6 @@ jobs:
           git clone $REPO_URL -b $REPO_BRANCH work
           ln -sf /${{matrix.work}}/work $GITHUB_WORKSPACE/work
 
-      - name: Copy ${{matrix.arch}} Config
-        if: env.IS_CONFIG_CONF == 'true'
-        run: |
-          [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}} ] && cp ${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}} work/feeds.conf.default
-          [ -e ${{matrix.work}}/${{matrix.arch}}/.config ] && cp ${{matrix.work}}/${{matrix.arch}}/.config work/.config
-          if ${{env.IS_KERNEL_CONF}} == 'true';then
-            [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}} ] && cat ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}} >> work/config/Config-kernel.in
-          fi
-          cd work/ && git status
-
       - name: Update feeds
         if: env.IS_CONFIG_CONF == 'true'
         working-directory: /${{matrix.work}}/work
@@ -273,21 +263,30 @@ jobs:
           [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE2}} ] && chmod +x ${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE2}}
           cd work
           ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE2}}
+
+      - name: Copy ${{matrix.arch}} Config
+        if: env.IS_CONFIG_CONF == 'true'
+        run: |
+          [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}} ] && cp ${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}} work/feeds.conf.default
+          [ -e ${{matrix.work}}/${{matrix.arch}}/.config ] && cp ${{matrix.work}}/${{matrix.arch}}/.config work/.config
+          if ${{env.IS_KERNEL_CONF}} == 'true';then
+            [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}} ] && cat ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}} >> work/config/Config-kernel.in
+          fi
+          cd work/ && git status
+          
       - name: Make ${{matrix.work}} ${{matrix.arch}}
         if: env.IS_CONFIG_CONF == 'true'
         id: make
         working-directory: /${{matrix.work}}/work
         run: |
           echo -e "$(nproc) thread compile"
-          cat config/Config-kernel.in
-          cat .config
 
           grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
           cat DEVICE_NAME
           [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
-          echo ${DEVICE_NAME}
+          echo "$环境变量{DEVICE_NAME}"
           echo "FIRMWARE=$PWD/bin/targets/${{matrix.arch}}/*" >> $GITHUB_ENV
-          echo "${FIRMWARE}"
+          echo "路径${FIRMWARE}"
 
       - name: Upload firmware to WeTransfer
         id: wetransfer
