@@ -211,8 +211,6 @@ jobs:
         if: env.IS_CONFIG_CONF == 'true'
         run: |
           echo "有配置文件继续后面流程"
-          sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
-          
           sudo timedatectl set-timezone "Asia/Shanghai"
           sudo mkdir -p /${{matrix.work}}
           sudo chown $USER:$GROUPS /${{matrix.work}}
@@ -244,7 +242,7 @@ jobs:
 
       - name: Update feeds
         if: env.IS_CONFIG_CONF == 'true'
-        working-directory: $GITHUB_WORKSPACE/work
+        working-directory: /${{matrix.work}}/work
         run: echo $PWD && ./scripts/feeds update -a
 
       - name: Ready Shell RUN
@@ -256,12 +254,12 @@ jobs:
 
       - name: Install feeds
         if: env.IS_CONFIG_CONF == 'true'
-        working-directory: $GITHUB_WORKSPACE/work
+        working-directory: /${{matrix.work}}/work
         run: ./scripts/feeds install -a
 
       - name: Download ${{matrix.work}} package
         if: env.IS_CONFIG_CONF == 'true'
-        working-directory: $GITHUB_WORKSPACE/work        
+        working-directory: /${{matrix.work}}/work
         id: package
         run: |
           make defconfig
@@ -278,7 +276,7 @@ jobs:
       - name: Make ${{matrix.work}} ${{matrix.arch}}
         if: env.IS_CONFIG_CONF == 'true'
         id: make
-        working-directory: $GITHUB_WORKSPACE/work
+        working-directory: /${{matrix.work}}/work
         run: |
           echo -e "$(nproc) thread compile"
 
