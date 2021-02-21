@@ -230,7 +230,7 @@ jobs:
           echo $PWD
           echo $REPO_URL
           echo $REPO_BRANCH
-          git clone https://github.com/openwrt/openwrt.git -b master work
+          git clone $REPO_URL -b $REPO_BRANCH work
           ln -sf /${{matrix.work}}/work $GITHUB_WORKSPACE/work
 
       #找到必要配置文件开始设置运行环境
