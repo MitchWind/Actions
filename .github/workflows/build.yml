@@ -238,6 +238,8 @@ jobs:
         working-directory: /${{matrix.work}}
         run: |
           df -hT $PWD
+          echo $REPO_URL
+          echo $REPO_BRANCH
           git clone $REPO_URL -b $REPO_BRANCH work
           ln -sf /${{matrix.work}}/work $GITHUB_WORKSPACE/work
 
@@ -291,7 +293,7 @@ jobs:
         run: |
           echo -e "$(nproc) thread compile"
 
-          
+
           grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
           [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
           echo ${DEVICE_NAME}
@@ -304,4 +306,9 @@ jobs:
           curl -fsSL git.io/file-transfer | sh
           ./transfer wet -s -p 16 --no-progress ${FIRMWARE} 2>&1 | tee wetransfer.log
           echo "::warning file=wetransfer.com::$(cat wetransfer.log | grep https)"
-          echo "::set-output name=url::$(cat wetransfer.log | grep https | cut -f3 -d" ")"    
+          echo "::set-output name=url::$(cat wetransfer.log | grep https | cut -f3 -d" ")"
+
+      - name: Delete workflow runs
+        uses: Mattraks/delete-workflow-runs@main
+        with:
+          retain_days: 1    
