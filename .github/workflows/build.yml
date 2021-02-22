@@ -132,7 +132,8 @@ jobs:
           name: ${{matrix.work}}_${{matrix.arch}}_config
           path: |
             default/default.sh
-            ${{matrix.work}}/${{matrix.arch}}/.config 
+            ${{matrix.work}}/${{matrix.arch}}/.config
+            ${{matrix.work}}/${{matrix.arch}}/.kConfig
             ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
 
       - name: Make ls
