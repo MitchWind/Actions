@@ -270,7 +270,7 @@ jobs:
         id: make
         working-directory: /${{matrix.work}}/work
         run: |
-          echo "FIRMWARE=$PWD/bin/targets/${{matrix.arch}}/${{envDEVICE_TARGET}}" >> $GITHUB_ENV
+          echo "FIRMWARE=$PWD/bin/targets/${{matrix.arch}}/${{env.DEVICE_TARGET}}" >> $GITHUB_ENV
           echo "PACKAGES=$PWD/bin/packages/${{env.DEVICE_ARCH}}/" >> $GITHUB_ENV
 
       - name: Upload firmware to WeTransfer
