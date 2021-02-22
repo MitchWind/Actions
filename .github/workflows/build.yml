@@ -283,7 +283,7 @@ jobs:
         if: env.IS_CONFIG_CONF == 'true'
         uses: actions/upload-artifact@v2
         with:
-          name: ${{matrix.work}}_${{matrix.arch}}_config
+          name: ${{matrix.work}}-${{matrix.arch}}-config
           path: |
             /${{matrix.work}}/work/.config
             /${{matrix.work}}/work/config/Config-kernel.in
