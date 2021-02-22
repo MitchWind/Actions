@@ -280,6 +280,7 @@ jobs:
           echo "PACKAGES=$PWD/bin/packages/${{env.DEVICE_TARGET}}/" >> $GITHUB_ENV
 
       - name: "Upload Config  Artifact"
+        if: env.IS_CONFIG_CONF == 'true'
         uses: actions/upload-artifact@v2
         with:
           name: ${{matrix.work}}_${{matrix.arch}}_config
