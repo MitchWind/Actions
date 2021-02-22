@@ -140,8 +140,8 @@ jobs:
         if: steps.check_config.outputs.files_exists == 'true'
         run: |
           [ -d ${{matrix.work}}/${{matrix.arch}}/ ] && ls -lah ${{matrix.work}}/${{matrix.arch}}/
-          [ -e ${{matrix.work}}/${{matrix.arch}}/.kConfig ] && cat ${{matrix.work}}/${{matrix.arch}}/.kConfig
-          [ -e ${{matrix.work}}/${{matrix.arch}}/.kConfig.in ] && cat ${{matrix.work}}/${{matrix.arch}}/.kConfig.in
+          if [ -f ${{matrix.work}}/${{matrix.arch}}/.kConfig ]; cat ${{matrix.work}}/${{matrix.arch}}/.kConfig;fi
+          if [ -f ${{matrix.work}}/${{matrix.arch}}/.kConfig.in ]; cat ${{matrix.work}}/${{matrix.arch}}/.kConfig.in;fi
       
       - name: Cache Config
         if: steps.check_config.outputs.files_exists == 'true'
