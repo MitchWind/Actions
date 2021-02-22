@@ -109,8 +109,7 @@ jobs:
           fi
           if [ -f ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}} ];then 
               cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}} >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in          
-          fi
-          cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig >> ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.config
+          fi          
           cp ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
       - name: Start SSH via tmate
         uses: P3TERX/ssh2actions@main
@@ -139,7 +138,7 @@ jobs:
       - name: Make ls
         if: steps.check_config.outputs.files_exists == 'true'
         run: |
-          [ -d ${{matrix.work}}/${{matrix.arch}}/ ] && ls -lah ${{matrix.work}}/${{matrix.arch}}/
+          [[ -d ${{matrix.work}}/${{matrix.arch}}/ ]] && ls -lah ${{matrix.work}}/${{matrix.arch}}/
           if [ -f ${{matrix.work}}/${{matrix.arch}}/.kConfig ];then cat ${{matrix.work}}/${{matrix.arch}}/.kConfig;fi
           if [ -f ${{matrix.work}}/${{matrix.arch}}/.kConfig.in ];then cat ${{matrix.work}}/${{matrix.arch}}/.kConfig.in;fi
       
@@ -224,10 +223,7 @@ jobs:
         if: env.IS_CONFIG_CONF == 'true'
         run: |
           [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}} ] && cp ${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}} work/feeds.conf.default          
-          [ -e ${{matrix.work}}/${{matrix.arch}}/.config ] && cp ${{matrix.work}}/${{matrix.arch}}/.config work/.config
-          if ${{env.IS_KERNEL_CONF}} == 'true';then
-            [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}} ] && cat ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}} >> work/config/Config-kernel.in
-          fi
+          [ -e ${{matrix.work}}/${{matrix.arch}}/.config ] && cp ${{matrix.work}}/${{matrix.arch}}/.config work/.config         
           cd work/ && git status && ls -lah
 
       - name: Update feeds
@@ -262,6 +258,7 @@ jobs:
           [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE2}} ] && chmod +x ${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE2}}
           cd work
           ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE2}}
+
       - name: Get  ${{matrix.work}} ${{matrix.arch}} Config Env
         if: env.IS_CONFIG_CONF == 'true'
         working-directory: /${{matrix.work}}/work
@@ -270,7 +267,12 @@ jobs:
           echo "DEVICE_ARCH=$(grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*_(.*)_DEVICE_.*=y/\1/')" >> $GITHUB_ENV
           echo "DEVICE_TARGET=$(grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/CONFIG_TARGET_(.*)_DEVICE_.*=y/\1/')" >> $GITHUB_ENV
           
-            
+      - name: Auto ${{matrix.arch}} Kernel Config
+        if: env.IS_CONFIG_CONF == 'true' && env.IS_KERNEL_CONF =='true'
+        run: |
+          cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig >> /${{matrix.work}}/work/.config
+          [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}} ] && cat ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}} >> work/config/Config-kernel.in
+
       - name: Make ${{matrix.work}} ${{matrix.arch}}
         if: env.IS_CONFIG_CONF == 'true'
         id: make
@@ -289,6 +291,7 @@ jobs:
             /${{matrix.work}}/work/.config
             /${{matrix.work}}/work/config/Config-kernel.in
             ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
+
       - name: Upload firmware to WeTransfer
         id: wetransfer
         if: env.UP_WETRANSFER =='true' && success()
@@ -307,7 +310,6 @@ jobs:
           server: ${{env.FTP_SERVER}}
           username: ${{env.FTP_USERNAME}}
           password: ${{ secrets.FTP_PASSWOD }}
-          dry-run: true
           local-dir: ${{env.FIRMWARE}}/
           server-dir: ${{matrix.work}}/${{matrix.arch}}/firmware/
           exclude: packages/**
@@ -321,7 +323,6 @@ jobs:
           server: ${{env.FTP_SERVER}}
           username: ${{env.FTP_USERNAME}}
           password: ${{ secrets.FTP_PASSWOD }}
-          dry-run: true
           local-dir: ${{env.PACKAGES}}
           server-dir: ${{matrix.work}}/${{matrix.arch}}/package/
 
