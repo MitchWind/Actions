@@ -219,13 +219,6 @@ jobs:
           fi
           cd work/ && git status && ls -lah
 
-      - name: "Upload Artifact"
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{matrix.work}}workconfig
-          path: |
-            /${{matrix.work}}/work/.config
-            /${{matrix.work}}/work/config/Config-kernel.in
       - name: Update feeds
         if: env.IS_CONFIG_CONF == 'true'
         working-directory: /${{matrix.work}}/work
@@ -265,8 +258,9 @@ jobs:
         working-directory: /${{matrix.work}}/work
         run: |
           echo -e "$(nproc) thread compile"
-          
+
           grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
+          cat DEVICE_NAME
           [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
           echo "${DEVICE_NAME}"
           echo "FIRMWARE=$PWD/bin/targets/${{matrix.arch}}/*" >> $GITHUB_ENV
