@@ -283,7 +283,7 @@ jobs:
           echo "::set-output name=url::$(cat wetransfer.log | grep https | cut -f3 -d" ")"
 
       - name: Sync firmware Upload FTP
-        id: ftp
+        id: ftpfirmware
         if: env.UP_FTP =='true' && env.IS_CONFIG_CONF == 'true'
         uses: SamKirkland/FTP-Deploy-Action@4.0.0
         with:
@@ -295,7 +295,7 @@ jobs:
           exclude: packages/**
       
       - name: Sync package Upload FTP
-        id: ftp
+        id: ftppackage
         if: env.UP_FTP =='true' && env.IS_CONFIG_CONF == 'true'
         uses: SamKirkland/FTP-Deploy-Action@4.0.0
         with:
