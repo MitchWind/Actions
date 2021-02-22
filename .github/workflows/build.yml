@@ -139,9 +139,10 @@ jobs:
       - name: Make ls
         if: steps.check_config.outputs.files_exists == 'true'
         run: |
-          [ -d ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/ ] && ls -lah ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/
-          [ -e ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig ] && cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig
-          [ -e ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in ] && cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig.in
+          [ -d ${{matrix.work}}/${{matrix.arch}}/ ] && ls -lah ${{matrix.work}}/${{matrix.arch}}/
+          [ -e ${{matrix.work}}/${{matrix.arch}}/.kConfig ] && cat ${{matrix.work}}/${{matrix.arch}}/.kConfig
+          [ -e ${{matrix.work}}/${{matrix.arch}}/.kConfig.in ] && cat ${{matrix.work}}/${{matrix.arch}}/.kConfig.in
+      
       - name: Cache Config
         if: steps.check_config.outputs.files_exists == 'true'
         uses: actions/cache@v2
