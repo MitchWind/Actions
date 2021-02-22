@@ -255,7 +255,6 @@ jobs:
         run: |
           [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE2}} ] && chmod +x ${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE2}}
           cd work
-          ls -lah
           ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE2}}
       - name: Get  ${{matrix.work}} ${{matrix.arch}} Config Env
         if: env.IS_CONFIG_CONF == 'true'
@@ -272,7 +271,7 @@ jobs:
         id: make
         working-directory: /${{matrix.work}}/work
         run: |
-          echo -e "$(nproc) thread compile"
+          make default
 
       - name: Upload firmware to WeTransfer
         id: wetransfer
@@ -288,10 +287,10 @@ jobs:
         if: env.UP_FTP =='true' && env.IS_CONFIG_CONF == 'true'
         uses: SamKirkland/FTP-Deploy-Action@4.0.0
         with:
-          server: ${{FTP_SERVER}}
-          username: ${{FTP_USERNAME}}
+          server: ${{env.FTP_SERVER}}
+          username: ${{env.FTP_USERNAME}}
           password: ${{ secrets.FTP_PASSWOD }}
-          local-dir: ${{FIRMWARE}}/
+          local-dir: ${{env.FIRMWARE}}/
           server-dir: ${{matrix.work}}/${{matrix.arch}}/firmware/
           exclude: packages/**
       
@@ -300,10 +299,10 @@ jobs:
         if: env.UP_FTP =='true' && env.IS_CONFIG_CONF == 'true'
         uses: SamKirkland/FTP-Deploy-Action@4.0.0
         with:
-          server: ${{FTP_SERVER}}
-          username: ${{FTP_USERNAME}}
+          server: ${{env.FTP_SERVER}}
+          username: ${{env.FTP_USERNAME}}
           password: ${{ secrets.FTP_PASSWOD }}
-          local-dir: ${{PACKAGES}}/
+          local-dir: ${{env.PACKAGES}}/
           server-dir: ${{matrix.work}}/${{matrix.arch}}/firmware/
 
   Clean:
