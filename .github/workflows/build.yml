@@ -201,6 +201,11 @@ jobs:
           echo "REPO_URL=${REPO_URL}" >> $GITHUB_ENV
           echo "REPO_BRANCH=${REPO_BRANCH}" >> $GITHUB_ENV
           echo "UP_WETRANSFER=${UP_WETRANSFER}" >> $GITHUB_ENV
+          echo "UP_FTP=${UP_FTP}" >> $GITHUB_ENV
+          if $UP_FTP =='true';then            
+            echo "FTP_SERVER=${FTP_SERVER}" >> $GITHUB_ENV
+            echo "FTP_USERNAME=${FTP_USERNAME}" >> $GITHUB_ENV
+          fi
 
       - name: Clone ${{matrix.work}} source code
         if: env.IS_CONFIG_CONF == 'true'
@@ -277,6 +282,29 @@ jobs:
           ./transfer wet -s -p 16 --no-progress ${FIRMWARE} 2>&1 | tee wetransfer.log
           echo "::warning file=wetransfer.com::$(cat wetransfer.log | grep https)"
           echo "::set-output name=url::$(cat wetransfer.log | grep https | cut -f3 -d" ")"
+
+      - name: Sync firmware Upload FTP
+        id: ftp
+        if: env.UP_FTP =='true' && env.IS_CONFIG_CONF == 'true'
+        uses: SamKirkland/FTP-Deploy-Action@4.0.0
+        with:
+          server: ${{FTP_SERVER}}
+          username: ${{FTP_USERNAME}}
+          password: ${{ secrets.FTP_PASSWOD }}
+          local-dir: ${{FIRMWARE}}/
+          server-dir: ${{matrix.work}}/${{matrix.arch}}/firmware/
+          exclude: packages/**
+      
+      - name: Sync package Upload FTP
+        id: ftp
+        if: env.UP_FTP =='true' && env.IS_CONFIG_CONF == 'true'
+        uses: SamKirkland/FTP-Deploy-Action@4.0.0
+        with:
+          server: ${{FTP_SERVER}}
+          username: ${{FTP_USERNAME}}
+          password: ${{ secrets.FTP_PASSWOD }}
+          local-dir: ${{PACKAGES}}/
+          server-dir: ${{matrix.work}}/${{matrix.arch}}/firmware/
 
   Clean:
     name: Clean Jobs
