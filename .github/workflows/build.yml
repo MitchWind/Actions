@@ -279,10 +279,19 @@ jobs:
           echo "FIRMWARE=$PWD/bin/targets/${{matrix.arch}}/${{env.DEVICE_ARCH}}" >> $GITHUB_ENV
           echo "PACKAGES=$PWD/bin/packages/${{env.DEVICE_TARGET}}/" >> $GITHUB_ENV
 
+      - name: "Upload Config  Artifact"
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{matrix.work}}_${{matrix.arch}}_config
+          path: |
+            /${{matrix.work}}/work/.config
+            /${{matrix.work}}/work/config/Config-kernel.in
+            ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
       - name: Upload firmware to WeTransfer
         id: wetransfer
         if: env.UP_WETRANSFER =='true' && success()
         run: |
+          rm -rf ${{env.PACKAGES}}/packages
           curl -fsSL git.io/file-transfer | sh
           ./transfer wet -s -p 16 --no-progress ${FIRMWARE} 2>&1 | tee wetransfer.log
           echo "::warning file=wetransfer.com::$(cat wetransfer.log | grep https)"
@@ -300,6 +309,7 @@ jobs:
           local-dir: ${{env.FIRMWARE}}/
           server-dir: ${{matrix.work}}/${{matrix.arch}}/firmware/
           exclude: packages/**
+                - packages
       
       - name: Sync package Upload FTP
         id: ftppackage
@@ -310,8 +320,8 @@ jobs:
           username: ${{env.FTP_USERNAME}}
           password: ${{ secrets.FTP_PASSWOD }}
           dry-run: true
-          local-dir: ${{env.PACKAGES}}/
-          server-dir: ${{matrix.work}}/${{matrix.arch}}/firmware/
+          local-dir: ${{env.PACKAGES}}
+          server-dir: ${{matrix.work}}/${{matrix.arch}}/package/
 
   Clean:
     name: Clean Jobs
