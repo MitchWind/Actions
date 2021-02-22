@@ -224,7 +224,8 @@ jobs:
         if: env.IS_CONFIG_CONF == 'true'
         run: |
           [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}} ] && cp ${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}} work/feeds.conf.default          
-          [ -e ${{matrix.work}}/${{matrix.arch}}/.config ] && cp ${{matrix.work}}/${{matrix.arch}}/.config work/.config         
+          [ -e ${{matrix.work}}/${{matrix.arch}}/.config ] && cp ${{matrix.work}}/${{matrix.arch}}/.config work/.config
+          cat ${{matrix.work}}/${{matrix.arch}}/.config         
           cd work/ && git status && ls -lah
 
       - name: Update feeds
