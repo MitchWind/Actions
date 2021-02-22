@@ -259,8 +259,8 @@ jobs:
           echo "DEVICE_NAME=$(grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/')" >> $GITHUB_ENV
           echo "DEVICE_ARCH=$(grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/CONFIG_TARGET_(.*)_DEVICE_.*=y/\1/')" >> $GITHUB_ENV
           echo "DEVICE_TARGET=$(grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/_(.*)_DEVICE_.*=y/\1/')" >> $GITHUB_ENV
-          echo "FIRMWARE=$PWD/bin/targets/${{matrix.arch}}/${{DEVICE_TARGET}}" >> $GITHUB_ENV
-          echo "PACKAGES=$PWD/bin/packages/${{DEVICE_ARCH}}/" >> $GITHUB_ENV
+          echo "FIRMWARE=$PWD/bin/targets/${{matrix.arch}}/$DEVICE_TARGET" >> $GITHUB_ENV
+          echo "PACKAGES=$PWD/bin/packages/$DEVICE_ARCH/" >> $GITHUB_ENV
             
       - name: Make ${{matrix.work}} ${{matrix.arch}}
         if: env.IS_CONFIG_CONF == 'true'
