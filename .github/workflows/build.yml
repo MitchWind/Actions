@@ -290,6 +290,7 @@ jobs:
           server: ${{env.FTP_SERVER}}
           username: ${{env.FTP_USERNAME}}
           password: ${{ secrets.FTP_PASSWOD }}
+          dry-run: true
           local-dir: ${{env.FIRMWARE}}/
           server-dir: ${{matrix.work}}/${{matrix.arch}}/firmware/
           exclude: packages/**
@@ -302,6 +303,7 @@ jobs:
           server: ${{env.FTP_SERVER}}
           username: ${{env.FTP_USERNAME}}
           password: ${{ secrets.FTP_PASSWOD }}
+          dry-run: true
           local-dir: ${{env.PACKAGES}}/
           server-dir: ${{matrix.work}}/${{matrix.arch}}/firmware/
 
