@@ -1,5 +1,5 @@
 #!/bin/bash
-sed -i 's/192.168.1.1/192.168.5.1/g' package/base-files/files/bin/config_generate
+sed -i 's/192.168.1.1/192.168.3.1/g' package/base-files/files/bin/config_generate
 sed -i 's/255.255.255.0/255.255.0.0/g' package/base-files/files/bin/config_generate
 sed -i 's/OpenWrt/Wind/g' package/base-files/files/bin/config_generate
 sed -i 's/+ariang/+ariang-nginx/g' package/feeds/luci/luci-app-aria2/Makefile
