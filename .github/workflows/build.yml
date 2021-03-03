@@ -308,7 +308,7 @@ jobs:
           server: ${{env.FTP_SERVER}}
           username: ${{env.FTP_USERNAME}}
           password: ${{ secrets.FTP_PASSWOD }}
-          local-dir: ${{env.FIRMWARE}}/
+          local-dir: ${{env.FIRMWARE}}
           server-dir: ${{matrix.work}}/
           dangerous-clean-slate: true
 
