@@ -300,27 +300,18 @@ jobs:
             /${{matrix.work}}/work/config/Config-kernel.in
             ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
             
-      # - name: Sync firmware Upload FTP
-      #   id: ftpfirmware
-      #   if: env.UP_FTP =='true' && env.IS_CONFIG_CONF == 'true'
-      #   uses: SamKirkland/FTP-Deploy-Action@4.0.0
-      #   with:
-      #     server: ${{env.FTP_SERVER}}
-      #     username: ${{env.FTP_USERNAME}}
-      #     password: ${{ secrets.FTP_PASSWOD }}
-      #     local-dir: ${{env.FIRMWARE}}
-      #     server-dir: ${{matrix.work}}/
-      #     dangerous-clean-slate: true
       - name: Sync firmware Upload FTP
+        id: ftpfirmware
         if: env.UP_FTP =='true' && env.IS_CONFIG_CONF == 'true'
-        uses: sebastianpopp/ftp-action@releases/v2
+        uses: SamKirkland/FTP-Deploy-Action@4.0.0
         with:
-          host: ${{env.FTP_SERVER}}
-          user: ${{env.FTP_USERNAME}}
+          server: ${{env.FTP_SERVER}}
+          username: ${{env.FTP_USERNAME}}
           password: ${{ secrets.FTP_PASSWOD }}
-          localDir: "${{env.FIRMWARE}}"
-          remoteDir: "${{matrix.work}}/"
-          options: "--delete --asci"
+          local-dir: ${{env.FIRMWARE}}
+          server-dir: ${{matrix.work}}/
+          dangerous-clean-slate: true
+          exclude: '*.vmdk'
 
       - name: Upload firmware to WeTransfer
         id: wetransfer
