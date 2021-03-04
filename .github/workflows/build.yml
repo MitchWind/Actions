@@ -312,6 +312,7 @@ jobs:
       #     server-dir: ${{matrix.work}}/
       #     dangerous-clean-slate: true
       - name: Sync firmware Upload FTP
+        if: env.UP_FTP =='true' && env.IS_CONFIG_CONF == 'true'
         uses: sebastianpopp/ftp-action@releases/v2
         with:
           host: ${{env.FTP_SERVER}}
