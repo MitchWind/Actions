@@ -311,7 +311,9 @@ jobs:
           local-dir: ${{env.FIRMWARE}}
           server-dir: ${{matrix.work}}/
           dangerous-clean-slate: true
-          exclude: '*.vmdk'
+          exclude: ${{env.FIRMWARE}}/targets/${{matrix.work}}/${{env.DEVICE_ARCH}}/*.vmdk
+            - ${{env.FIRMWARE}}/targets/${{matrix.work}}/${{env.DEVICE_ARCH}}/*.gz
+            
 
       - name: Upload firmware to WeTransfer
         id: wetransfer
