@@ -318,8 +318,8 @@ jobs:
           host: ${{env.FTP_SERVER}}
           user: ${{env.FTP_USERNAME}}
           password: ${{ secrets.FTP_PASSWOD }}
-          localDir: ${{env.FIRMWARE}}
-          remoteDir: ${{matrix.work}}/
+          localDir: "${{env.FIRMWARE}}"
+          remoteDir: "${{matrix.work}}/"
           options: "--delete --asci"
 
       - name: Upload firmware to WeTransfer
