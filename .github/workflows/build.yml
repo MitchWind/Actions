@@ -1,4 +1,4 @@
-name: Build
+name: Build Firmware
 
 on:
   push:
@@ -277,7 +277,7 @@ jobs:
       - name: Auto ${{matrix.arch}} Kernel Config
         if: env.IS_CONFIG_CONF == 'true' && env.IS_KERNEL_CONF =='true'
         run: |
-          cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig >> /${{matrix.work}}/work/.config
+          cat ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/.kConfig >> work/.config
           [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}} ] && cat ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}} >> work/config/Config-kernel.in
 
       - name: Make ${{matrix.work}} ${{matrix.arch}}
