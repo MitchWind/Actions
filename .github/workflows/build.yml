@@ -193,8 +193,6 @@ jobs:
         run: |
           echo "有配置文件继续后面流程"
           sudo timedatectl set-timezone "Asia/Shanghai"
-          sudo mkdir -p /${{matrix.work}}
-          sudo chown $USER:$GROUPS /${{matrix.work}}
           sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
           sudo -E apt-get -qq update
           sudo -E apt-get -qq install $(curl -fsSL git.io/depends-ubuntu-1804)
@@ -227,7 +225,7 @@ jobs:
 
       - name: Update feeds
         if: env.IS_CONFIG_CONF == 'true'
-        working-directory: $GITHUB_WORKSPACE/work
+        working-directory: ${{env.GITHUB_WORKSPACE}}/work
         run: ./scripts/feeds update -a
 
       - name: Ready Shell RUN
@@ -238,7 +236,7 @@ jobs:
           
       - name: Install feeds
         if: env.IS_CONFIG_CONF == 'true'
-        working-directory: $GITHUB_WORKSPACE/work
+        working-directory: ${{env.GITHUB_WORKSPACE}}/work
         run: ./scripts/feeds install -a
 
       - name: Copy ${{matrix.arch}} Config
@@ -250,7 +248,7 @@ jobs:
           
       - name: Download ${{matrix.work}} package
         if: env.IS_CONFIG_CONF == 'true'
-        working-directory: $GITHUB_WORKSPACE/work
+        working-directory: ${{env.GITHUB_WORKSPACE}}/work
         id: package
         run: |
           cat .config
@@ -269,7 +267,7 @@ jobs:
 
       - name: Get  ${{matrix.work}} ${{matrix.arch}} Config Env
         if: env.IS_CONFIG_CONF == 'true'
-        working-directory: $GITHUB_WORKSPACE/work
+        working-directory: ${{env.GITHUB_WORKSPACE}}/work
         run: |
           echo "DEVICE_NAME=$(grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/')" >> $GITHUB_ENV
           echo "DEVICE_ARCH=$(grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*_(.*)_DEVICE_.*=y/\1/')" >> $GITHUB_ENV
@@ -284,32 +282,21 @@ jobs:
       - name: Make ${{matrix.work}} ${{matrix.arch}}
         if: env.IS_CONFIG_CONF == 'true'
         id: make
-        working-directory: $GITHUB_WORKSPACE/work
+        working-directory: ${{env.GITHUB_WORKSPACE}}/work
         run: |
           make -j$(nproc) || make -j1 || make -j1 V=s
           echo "FIRMWARE=work/bin/" >> $GITHUB_ENV
-                 
+
       - name: "Upload Config  Artifact"
         if: env.IS_CONFIG_CONF == 'true'
         uses: actions/upload-artifact@v2
         with:
           name: ${{matrix.work}}-${{matrix.arch}}-config
           path: |
-            /${{matrix.work}}/work/.config
-            /${{matrix.work}}/work/config/Config-kernel.in
+            work/.config
+            work/config/Config-kernel.in
             ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
-
-      - name: Upload firmware to WeTransfer
-        id: wetransfer
-        if: env.UP_WETRANSFER =='true' && success()
-        run: |
-          rm -rf ${FIRMWARE}/targets/${{matrix.arch}}/${{env.DEVICE_ARCH}}/packages
-          ls -lah ${FIRMWARE}/targets/${{matrix.arch}}/${{env.DEVICE_ARCH}}/
-          curl -fsSL git.io/file-transfer | sh
-          ./transfer wet -s -p 16 --no-progress ${FIRMWARE}/targets/${{matrix.arch}}/${{env.DEVICE_ARCH}} 2>&1 | tee wetransfer.log
-          echo "::warning file=wetransfer.com::$(cat wetransfer.log | grep https)"
-          echo "::set-output name=url::$(cat wetransfer.log | grep https | cut -f3 -d" "::warning file=wetransfer.com::$(cat wetransfer.log | grep https)"
-
+      
       - name: Sync firmware Upload FTP
         id: ftpfirmware
         if: env.UP_FTP =='true' && env.IS_CONFIG_CONF == 'true'
@@ -322,6 +309,16 @@ jobs:
           remoteDir: ${{matrix.work}}/
           options: "--delete --asci"
 
+      - name: Upload firmware to WeTransfer
+        id: wetransfer
+        if: env.UP_WETRANSFER =='true' && success()
+        run: |
+          rm -rf ${FIRMWARE}/targets/${{matrix.arch}}/${{env.DEVICE_ARCH}}/packages
+          ls -lah ${FIRMWARE}/targets/${{matrix.arch}}/${{env.DEVICE_ARCH}}/
+          curl -fsSL git.io/file-transfer | sh
+          ./transfer wet -s -p 16 --no-progress ${FIRMWARE}/targets/${{matrix.arch}}/${{env.DEVICE_ARCH}} 2>&1 | tee wetransfer.log
+          echo "::warning file=wetransfer.com::$(cat wetransfer.log | grep https)"
+          echo "::set-output name=url::$(cat wetransfer.log | grep https | cut -f3 -d" "::warning file=wetransfer.com::$(cat wetransfer.log | grep https)"
 
 
   Clean:
