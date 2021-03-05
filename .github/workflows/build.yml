@@ -221,11 +221,12 @@ jobs:
         if: env.IS_CONFIG_CONF == 'true'
         run: |
           [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}} ] && mv ${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}} work/feeds.conf.default
+          ls -lah
           cd work/ && git status && ls -lah
 
       - name: Update feeds
         if: env.IS_CONFIG_CONF == 'true'
-        working-directory: ${GITHUB_WORKSPACE}/work
+        working-directory: ./work
         run: ./scripts/feeds update -a
 
       - name: Ready Shell RUN
@@ -236,7 +237,7 @@ jobs:
           
       - name: Install feeds
         if: env.IS_CONFIG_CONF == 'true'
-        working-directory: ${GITHUB_WORKSPACE}/work
+        working-directory: ./work
         run: ./scripts/feeds install -a
 
       - name: Copy ${{matrix.arch}} Config
@@ -248,7 +249,7 @@ jobs:
           
       - name: Download ${{matrix.work}} package
         if: env.IS_CONFIG_CONF == 'true'
-        working-directory: ${GITHUB_WORKSPACE}/work
+        working-directory: ./work
         id: package
         run: |
           cat .config
@@ -267,7 +268,7 @@ jobs:
 
       - name: Get  ${{matrix.work}} ${{matrix.arch}} Config Env
         if: env.IS_CONFIG_CONF == 'true'
-        working-directory: ${GITHUB_WORKSPACE}/work
+        working-directory: ./work
         run: |
           echo "DEVICE_NAME=$(grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/')" >> $GITHUB_ENV
           echo "DEVICE_ARCH=$(grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*_(.*)_DEVICE_.*=y/\1/')" >> $GITHUB_ENV
@@ -282,7 +283,7 @@ jobs:
       - name: Make ${{matrix.work}} ${{matrix.arch}}
         if: env.IS_CONFIG_CONF == 'true'
         id: make
-        working-directory: ${GITHUB_WORKSPACE}/work
+        working-directory: ./work
         run: |
           make -j$(nproc) || make -j1 || make -j1 V=s
           echo "FIRMWARE=work/bin/" >> $GITHUB_ENV
