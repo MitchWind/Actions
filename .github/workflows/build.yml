@@ -195,7 +195,7 @@ jobs:
           sudo timedatectl set-timezone "Asia/Shanghai"
           sudo mkdir -p /${{matrix.work}}
           sudo chown $USER:$GROUPS /${{matrix.work}}
-          sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
+          # sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
           sudo -E apt-get -qq update
           sudo -E apt-get -qq install $(curl -fsSL git.io/depends-ubuntu-1804)
           sudo -E apt-get -qq autoremove --purge
@@ -238,10 +238,10 @@ jobs:
           [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}} ] && chmod +x ${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}}
           cd work && ${GITHUB_WORKSPACE}/${{matrix.work}}/${{matrix.arch}}/${{env.AUTO_SH_FILE1}}
           
-      - name: Install feeds
-        if: env.IS_CONFIG_CONF == 'true'
-        working-directory: /${{matrix.work}}/work
-        run: ./scripts/feeds install -a
+      # - name: Install feeds
+      #   if: env.IS_CONFIG_CONF == 'true'
+      #   working-directory: /${{matrix.work}}/work
+      #   run: ./scripts/feeds install -a
 
       - name: Copy ${{matrix.arch}} Config
         if: env.IS_CONFIG_CONF == 'true'
@@ -250,17 +250,17 @@ jobs:
           cat work/.config
           cd work/ && git status && ls -lah
           
-      - name: Download ${{matrix.work}} package
-        if: env.IS_CONFIG_CONF == 'true'
-        working-directory: /${{matrix.work}}/work
-        id: package
-        run: |
-          cat .config
-          ls -lah
-          make defconfig
-          make download -j8
-          find dl -size -1024c -exec ls -l {} \;
-          find dl -size -1024c -exec rm -f {} \;
+      # - name: Download ${{matrix.work}} package
+      #   if: env.IS_CONFIG_CONF == 'true'
+      #   working-directory: /${{matrix.work}}/work
+      #   id: package
+      #   run: |
+      #     cat .config
+      #     ls -lah
+      #     make defconfig
+      #     make download -j8
+      #     find dl -size -1024c -exec ls -l {} \;
+      #     find dl -size -1024c -exec rm -f {} \;
 
       - name: Comply Shell Run
         if: env.AUTO_SH_RUN && env.IS_CONFIG_CONF == 'true'
@@ -290,9 +290,12 @@ jobs:
         run: |
           # make -j$(nproc) || make -j1 || make -j1 V=s
           echo "FIRMWARE=work/bin/" >> $GITHUB_ENV
-          ls -lah work/
-          ls -lah /github/workspace         
-
+      - name: Upload firmware to WeTransfer
+        id: wetransfer
+        if: env.UP_WETRANSFER =='true' && success()
+        run: |
+          ls -lah
+          ls -lah work          
       - name: "Upload Config  Artifact"
         if: env.IS_CONFIG_CONF == 'true'
         uses: actions/upload-artifact@v2
@@ -302,7 +305,18 @@ jobs:
             /${{matrix.work}}/work/.config
             /${{matrix.work}}/work/config/Config-kernel.in
             ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
-            
+
+      - name: Upload firmware to WeTransfer
+        id: wetransfer
+        if: env.UP_WETRANSFER =='true' && success()
+        run: |
+          rm -rf ${FIRMWARE}/targets/${{matrix.arch}}/${{env.DEVICE_ARCH}}/packages
+          ls -lah ${FIRMWARE}/targets/${{matrix.arch}}/${{env.DEVICE_ARCH}}/
+          curl -fsSL git.io/file-transfer | sh
+          ./transfer wet -s -p 16 --no-progress ${FIRMWARE}/targets/${{matrix.arch}}/${{env.DEVICE_ARCH}} 2>&1 | tee wetransfer.log
+          echo "::warning file=wetransfer.com::$(cat wetransfer.log | grep https)"
+          echo "::set-output name=url::$(cat wetransfer.log | grep https | cut -f3 -d" "::warning file=wetransfer.com::$(cat wetransfer.log | grep https)"
+
       - name: Sync firmware Upload FTP
         id: ftpfirmware
         if: env.UP_FTP =='true' && env.IS_CONFIG_CONF == 'true'
@@ -314,18 +328,6 @@ jobs:
           localDir: ${{env.FIRMWARE}}
           remoteDir: ${{matrix.work}}/
           options: "--delete --asci"
-            
-
-      - name: Upload firmware to WeTransfer
-        id: wetransfer
-        if: env.UP_WETRANSFER =='true' && success()
-        run: |
-          rm -rf ${FIRMWARE}/targets/${{matrix.arch}}/${{env.DEVICE_ARCH}}/packages
-          ls -lah ${FIRMWARE}/targets/${{matrix.arch}}/${{env.DEVICE_ARCH}}/
-          curl -fsSL git.io/file-transfer | sh
-          ./transfer wet -s -p 16 --no-progress ${FIRMWARE}/targets/${{matrix.arch}}/${{env.DEVICE_ARCH}} 2>&1 | tee wetransfer.log
-          echo "::warning file=wetransfer.com::$(cat wetransfer.log | grep https)"
-          echo "::set-output name=url::$(cat wetransfer.log | grep https | cut -f3 -d" ")"
 
 
 
