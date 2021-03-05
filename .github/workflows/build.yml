@@ -187,8 +187,7 @@ jobs:
         if: steps.check_config.outputs.files_exists == 'true'
         run: |
           echo "IS_CONFIG_CONF=true" >> $GITHUB_ENV
-          echo ${{env.GITHUB_WORKSPACE}}
-          ls -lah
+          echo "$GITHUB_WORKSPACE"
 
         #找到必要配置文件开始设置运行环境
       - name: Install Initialization
