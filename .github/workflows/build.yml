@@ -185,7 +185,8 @@ jobs:
           files: "${{matrix.work}}, ${{matrix.work}}/${{matrix.arch}}, ${{matrix.work}}/${{matrix.arch}}/.config,${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}}"
       - name: Set Config Status
         if: steps.check_config.outputs.files_exists == 'true'
-        run: echo "IS_CONFIG_CONF=true" >> $GITHUB_ENV
+        run: |
+          echo "IS_CONFIG_CONF=true" >> $GITHUB_ENV
           echo ${{env.GITHUB_WORKSPACE}}
           ls -lah
 
