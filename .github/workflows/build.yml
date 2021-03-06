@@ -301,14 +301,15 @@ jobs:
       - name: Sync firmware Upload FTP
         id: ftpfirmware
         if: env.UP_FTP =='true' && env.IS_CONFIG_CONF == 'true'
-        uses: sebastianpopp/ftp-action@releases/v2
+        uses: airvzxf/ftp-deployment-action@latest
         with:
-          host: ${{env.FTP_SERVER}}
+          server: ${{env.FTP_SERVER}}
           user: ${{env.FTP_USERNAME}}
           password: ${{ secrets.FTP_PASSWOD }}
-          localDir: ${{env.FIRMWARE}}
-          remoteDir: ${{matrix.work}}/
-          options: "--delete --asci"
+          local_dir: ${{env.FIRMWARE}}
+          remote_dir: ${{matrix.work}}/
+          delete: true
+          net_timeout: 10
 
       - name: Upload firmware to WeTransfer
         id: wetransfer
