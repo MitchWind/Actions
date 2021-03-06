@@ -270,6 +270,7 @@ jobs:
         if: env.IS_CONFIG_CONF == 'true'
         working-directory: ./work
         run: |
+          cat .config
           echo "DEVICE_NAME=$(grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/')" >> $GITHUB_ENV
           echo "DEVICE_ARCH=$(grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*_(.*)_DEVICE_.*=y/\1/')" >> $GITHUB_ENV
           echo "DEVICE_TARGET=$(grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/CONFIG_TARGET_(.*)_DEVICE_.*=y/\1/')" >> $GITHUB_ENV
@@ -310,6 +311,7 @@ jobs:
           remote_dir: ${{matrix.work}}
           delete: true
           net_timeout: 10
+          net_max_retries: 2
 
       - name: Upload firmware to WeTransfer
         id: wetransfer
