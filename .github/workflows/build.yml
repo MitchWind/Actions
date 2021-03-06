@@ -286,7 +286,7 @@ jobs:
         working-directory: ./work
         run: |
           make -j$(nproc) || make -j1 || make -j1 V=s
-          echo "FIRMWARE=work/bin/" >> $GITHUB_ENV
+          echo "FIRMWARE=work/bin" >> $GITHUB_ENV
 
       - name: "Upload Config  Artifact"
         if: env.IS_CONFIG_CONF == 'true'
@@ -307,7 +307,7 @@ jobs:
           user: ${{env.FTP_USERNAME}}
           password: ${{ secrets.FTP_PASSWOD }}
           local_dir: ${{env.FIRMWARE}}
-          remote_dir: ${{matrix.work}}/
+          remote_dir: ${{matrix.work}}
           delete: true
           net_timeout: 10
 
