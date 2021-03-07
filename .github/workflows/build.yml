@@ -213,6 +213,12 @@ jobs:
             echo "FTP_USERNAME=${FTP_USERNAME}" >> $GITHUB_ENV
           fi
 
+          echo "UP_QINIU=${UP_QINIU}" >> $GITHUB_ENV
+          if $UP_QINIU =='true';then            
+            echo "QINIU_SERVER=${QINIU_SERVER}" >> $GITHUB_ENV
+            echo "QINIU_BUCKET=${QINIU_BUCKET}" >> $GITHUB_ENV
+          fi
+
       - name: Clone ${{matrix.work}} source code
         if: env.IS_CONFIG_CONF == 'true'
         run: |
@@ -311,6 +317,19 @@ jobs:
           local_dir: ${{env.FIRMWARE}}
           server_dir: ${{matrix.work}}
 
+      - name: Sync firmware Qiniu Deploy
+        if: env.UP_QINIU =='true' && env.IS_CONFIG_CONF == 'true'
+        uses: saltbo/uptoc@master
+        with:
+          driver: qiniu
+          region: ${{env.QINIU_SERVER}}
+          bucket: ${{env.QINIU_BUCKET}}
+          exclude: .git
+          dist: ${{env.FIRMWARE}}
+          saveroot: ${{matrix.work}}
+        env:
+          UPTOC_UPLOADER_AK: ${{ secrets.UPTOC_UPLOADER_AK }}
+          UPTOC_UPLOADER_SK: ${{ secrets.UPTOC_UPLOADER_SK }}
       - name: Upload firmware to WeTransfer
         id: wetransfer
         if: env.UP_WETRANSFER =='true' && !cancelled()
