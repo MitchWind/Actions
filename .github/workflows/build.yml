@@ -314,8 +314,10 @@ jobs:
           server: ${{env.FTP_SERVER}}
           username: ${{env.FTP_USERNAME}}
           password: ${{ secrets.FTP_PASSWOD }}
+          ssl_allow: true
           local_dir: ${{env.FIRMWARE}}
           server_dir: ${{matrix.work}}
+          options: " --parallel 5"
 
       - name: Sync firmware Qiniu Deploy
         if: env.UP_QINIU =='true' && env.IS_CONFIG_CONF == 'true'
