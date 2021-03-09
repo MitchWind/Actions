@@ -305,22 +305,8 @@ jobs:
             work/.config
             work/config/Config-kernel.in
             ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
-      
-      - name: Sync firmware Upload FTP
-        id: ftpfirmware
-        if: env.UP_FTP =='true' && env.IS_CONFIG_CONF == 'true'
-        uses: MitchWind/ftp-deploy@master
-        with:
-          server: ${{env.FTP_SERVER}}
-          username: ${{env.FTP_USERNAME}}
-          password: ${{ secrets.FTP_PASSWOD }}
-          ssl_allow: true
-          local_dir: ${{env.FIRMWARE}}
-          server_dir: ${{matrix.work}}
-          options: " --parallel=5"
-
       - name: Sync firmware Qiniu Deploy
-        if: env.UP_QINIU =='true' && env.IS_CONFIG_CONF == 'true'
+        if: env.UP_QINIU =='true' && env.IS_CONFIG_CONF == 'true' && !cancelled()
         uses: saltbo/uptoc@master
         with:
           driver: qiniu
@@ -332,6 +318,20 @@ jobs:
         env:
           UPTOC_UPLOADER_AK: ${{ secrets.UPTOC_UPLOADER_AK }}
           UPTOC_UPLOADER_SK: ${{ secrets.UPTOC_UPLOADER_SK }}
+
+      - name: Sync firmware Upload FTP
+        id: ftpfirmware
+        if: env.UP_FTP =='true' && env.IS_CONFIG_CONF == 'true' && !cancelled()
+        uses: MitchWind/ftp-deploy@master
+        with:
+          server: ${{env.FTP_SERVER}}
+          username: ${{env.FTP_USERNAME}}
+          password: ${{ secrets.FTP_PASSWOD }}
+          ssl_allow: true
+          local_dir: ${{env.FIRMWARE}}
+          server_dir: ${{matrix.work}}
+          options: " --parallel=8"
+
       - name: Upload firmware to WeTransfer
         id: wetransfer
         if: env.UP_WETRANSFER =='true' && !cancelled()
