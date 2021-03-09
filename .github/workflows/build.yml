@@ -199,6 +199,7 @@ jobs:
           sudo -E apt-get -qq install lftp
           sudo -E apt-get -qq autoremove --purge
           sudo -E apt-get -qq clean
+          sudo timedatectl set-timezone "Asia/Shanghai"
 
       - name: Load ${{matrix.work}} Env
         if: env.IS_CONFIG_CONF == 'true'
