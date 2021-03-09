@@ -137,7 +137,7 @@ jobs:
             ${{matrix.work}}/${{matrix.arch}}/.kConfig
             ${{matrix.work}}/${{matrix.arch}}/${{env.KERNEL_IN}}
 
-      - name: Make ls
+      - name: Aotou Config
         if: steps.check_config.outputs.files_exists == 'true'
         run: |
           [[ -d ${{matrix.work}}/${{matrix.arch}}/ ]] && ls -lah ${{matrix.work}}/${{matrix.arch}}/
@@ -293,7 +293,7 @@ jobs:
         id: make
         working-directory: ./work
         run: |
-          make -j$(nproc) || make -j1 || make -j1 V=s
+          make -j$(nproc) V=s
           echo "FIRMWARE=work/bin" >> $GITHUB_ENV
 
       - name: "Upload Config  Artifact"
