@@ -9,7 +9,7 @@ on:
         required: true
         default: "true"
   schedule:
-    - cron:  '0 12 * * *'
+    - cron:  '0 6 * * *'
 env:
   #默认软件包
   FEEDS_CONF: feeds.conf.default
@@ -293,7 +293,7 @@ jobs:
         id: make
         working-directory: ./work
         run: |
-          make -j$(nproc) V=s
+          make -j$(nproc) || make -j1 || make -j1 V=s
           echo "FIRMWARE=work/bin" >> $GITHUB_ENV
 
       - name: "Upload Config  Artifact"
