@@ -303,8 +303,10 @@ jobs:
         with:
           name: ${{matrix.work}}-${{matrix.arch}}-firmware
           path: |
-            work/bin/packages
-            work/bin/targets/x86/64/packages
+            ${{matrix.work}}/${{matrix.arch}}/.config
+            ${{env.FIRMWARE}}
+            !${{env.FIRMWARE}}/**/openwrt-x86-64-generic?.gz
+
       - name: Sync firmware Qiniu Deploy
         if: env.UP_QINIU =='true' && env.IS_CONFIG_CONF == 'true' && !cancelled()
         uses: saltbo/uptoc@master
@@ -319,19 +321,6 @@ jobs:
           UPTOC_UPLOADER_AK: ${{ secrets.UPTOC_UPLOADER_AK }}
           UPTOC_UPLOADER_SK: ${{ secrets.UPTOC_UPLOADER_SK }}
 
-      - name: Sync firmware Upload FTP
-        id: ftpfirmware
-        if: env.UP_FTP =='true' && env.IS_CONFIG_CONF == 'true' && !cancelled()
-        uses: MitchWind/ftp-deploy@master
-        with:
-          server: ${{env.FTP_SERVER}}
-          username: ${{env.FTP_USERNAME}}
-          password: ${{ secrets.FTP_PASSWOD }}
-          ssl_allow: true
-          local_dir: ${{env.FIRMWARE}}
-          server_dir: ${{matrix.work}}
-          options: " --parallel=8"
-
       - name: Upload firmware to WeTransfer
         id: wetransfer
         if: env.UP_WETRANSFER =='true' && !cancelled()
@@ -342,6 +331,19 @@ jobs:
           ./transfer wet -s -p 16 --no-progress ${FIRMWARE}/targets/${{matrix.arch}}/${{env.DEVICE_ARCH}}/ 2>&1 | tee wetransfer.log
           echo "::warning file=wetransfer.com::$(cat wetransfer.log | grep https)"
           echo "::set-output name=url::$(cat wetransfer.log | grep https | cut -f3 -d" ")"
+
+      - name: Sync firmware Upload FTP
+        id: ftpfirmware
+        if: env.UP_FTP =='true' && env.IS_CONFIG_CONF == 'true' && !cancelled()
+        uses: MitchWind/ftp-deploy@master
+        with:
+          server: ${{env.FTP_SERVER}}
+          username: ${{env.FTP_USERNAME}}
+          password: ${{ secrets.FTP_PASSWOD }}
+          ssl_allow: true
+          local_dir: ${{env.FIRMWARE}}/targets/${{matrix.arch}}/${{env.DEVICE_ARCH}}
+          server_dir: ${{matrix.work}}/targets/${{matrix.arch}}/${{env.DEVICE_ARCH}}
+          options: " --parallel=8"
 
   Upload:
     name: Upload firmware 
@@ -356,25 +358,69 @@ jobs:
       - name: Checkout
         uses: actions/checkout@main
       #下载工作件
-      - name: Download Artifact
+      - name: Download ${{matrix.work}} firmware Artifact
         uses: actions/download-artifact@v2
+        id: download
         with:
           name: ${{matrix.work}}-${{matrix.arch}}-firmware
+          path: work/${{matrix.work}}
       #删除工作件
-      - name: Delete Artifact
+      - name: Delete ${{matrix.work}} firmware Artifact
         uses: geekyeggo/delete-artifact@v1
         with:
           name: ${{matrix.work}}-${{matrix.arch}}-firmware
           failOnError: false
       - name: Files Show
+        working-directory: "${{steps.download.outputs.download-path}}"
         run: |
           ls -lah
-          [ -e work ] && cd work && ls -lah
+          echo "FIRMWARE=${pwd}" >> $GITHUB_ENV
+      #验证必要的配置文件是否存在
+      - name: Check ${{matrix.work}} ${{matrix.arch}} Config
+        id: check_config
+        uses: andstor/file-existence-action@v1.0.1
+        with:
+          files: "${{matrix.work}}, ${{matrix.work}}/${{matrix.arch}}"
+      - name: Set Config Status
+        if: steps.check_config.outputs.files_exists == 'true'
+        run: echo "IS_CONFIG_CONF=true" >> $GITHUB_ENV
+
+      - name: Load ${{matrix.work}} Env
+        if: env.IS_CONFIG_CONF == 'true'
+        run: |
+          source "${GITHUB_WORKSPACE}/${{matrix.work}}/.env"
+          echo "REPO_URL=${REPO_URL}" >> $GITHUB_ENV
+          echo "REPO_BRANCH=${REPO_BRANCH}" >> $GITHUB_ENV
+          echo "UP_WETRANSFER=${UP_WETRANSFER}" >> $GITHUB_ENV
+          echo "UP_FTP=${UP_FTP}" >> $GITHUB_ENV
+          if $UP_FTP =='true';then            
+            echo "FTP_SERVER=${FTP_SERVER}" >> $GITHUB_ENV
+            echo "FTP_USERNAME=${FTP_USERNAME}" >> $GITHUB_ENV
+          fi
+
+          echo "UP_QINIU=${UP_QINIU}" >> $GITHUB_ENV
+          if $UP_QINIU =='true';then            
+            echo "QINIU_SERVER=${QINIU_SERVER}" >> $GITHUB_ENV
+            echo "QINIU_BUCKET=${QINIU_BUCKET}" >> $GITHUB_ENV
+          fi
+
+      - name: Sync firmware Upload FTP
+        id: ftpfirmware
+        if: env.UP_FTP =='true' && env.IS_CONFIG_CONF == 'true' && !cancelled()
+        uses: MitchWind/ftp-deploy@master
+        with:
+          server: ${{env.FTP_SERVER}}
+          username: ${{env.FTP_USERNAME}}
+          password: ${{ secrets.FTP_PASSWOD }}
+          ssl_allow: true
+          local_dir: ${{env.FIRMWARE}}
+          server_dir: ${{matrix.work}}
+          options: " --parallel=8"
 
   Clean:
     name: Clean Jobs
     runs-on: ubuntu-latest
-    needs: Make
+    needs: [Make,Upload]
     steps:
       - name: Delete workflow runs
         uses: Mattraks/delete-workflow-runs@main
