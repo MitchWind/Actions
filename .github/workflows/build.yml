@@ -307,19 +307,19 @@ jobs:
             ${{env.FIRMWARE}}
             !${{env.FIRMWARE}}/**/openwrt-x86-64-generic?.gz
 
-      - name: Sync firmware Qiniu Deploy
-        if: env.UP_QINIU =='true' && env.IS_CONFIG_CONF == 'true' && !cancelled()
-        uses: saltbo/uptoc@master
-        with:
-          driver: qiniu
-          region: ${{env.QINIU_SERVER}}
-          bucket: ${{env.QINIU_BUCKET}}
-          exclude: .git
-          dist: ${{env.FIRMWARE}}
-          saveroot: ${{matrix.work}}
-        env:
-          UPTOC_UPLOADER_AK: ${{ secrets.UPTOC_UPLOADER_AK }}
-          UPTOC_UPLOADER_SK: ${{ secrets.UPTOC_UPLOADER_SK }}
+      # - name: Sync firmware Qiniu Deploy
+      #   if: env.UP_QINIU =='true' && env.IS_CONFIG_CONF == 'true' && !cancelled()
+      #   uses: saltbo/uptoc@master
+      #   with:
+      #     driver: qiniu
+      #     region: ${{env.QINIU_SERVER}}
+      #     bucket: ${{env.QINIU_BUCKET}}
+      #     exclude: .git
+      #     dist: ${{env.FIRMWARE}}
+      #     saveroot: ${{matrix.work}}
+      #   env:
+      #     UPTOC_UPLOADER_AK: ${{ secrets.UPTOC_UPLOADER_AK }}
+      #     UPTOC_UPLOADER_SK: ${{ secrets.UPTOC_UPLOADER_SK }}
 
       - name: Upload firmware to WeTransfer
         id: wetransfer
