@@ -374,7 +374,8 @@ jobs:
         working-directory: "${{steps.download.outputs.download-path}}"
         run: |
           ls -lah
-          echo "FIRMWARE=${pwd}" >> $GITHUB_ENV
+          pwd
+          echo "FIRMWARE=$PWD" >> $GITHUB_ENV
       #验证必要的配置文件是否存在
       - name: Check ${{matrix.work}} ${{matrix.arch}} Config
         id: check_config
@@ -421,6 +422,7 @@ jobs:
     name: Clean Jobs
     runs-on: ubuntu-latest
     needs: [Make,Upload]
+    if: ${{ !always() }}
     steps:
       - name: Delete workflow runs
         uses: Mattraks/delete-workflow-runs@main
