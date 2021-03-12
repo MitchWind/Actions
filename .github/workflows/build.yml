@@ -305,7 +305,7 @@ jobs:
           path: |
             ${{matrix.work}}/${{matrix.arch}}/.config
             ${{env.FIRMWARE}}
-            !${{env.FIRMWARE}}/**/openwrt-x86-64-generic?.gz
+            !${{env.FIRMWARE}}/targets
 
       # - name: Sync firmware Qiniu Deploy
       #   if: env.UP_QINIU =='true' && env.IS_CONFIG_CONF == 'true' && !cancelled()
@@ -321,17 +321,6 @@ jobs:
       #     UPTOC_UPLOADER_AK: ${{ secrets.UPTOC_UPLOADER_AK }}
       #     UPTOC_UPLOADER_SK: ${{ secrets.UPTOC_UPLOADER_SK }}
 
-      - name: Upload firmware to WeTransfer
-        id: wetransfer
-        if: env.UP_WETRANSFER =='true' && !cancelled()
-        run: |
-          rm -rf ${FIRMWARE}/targets/${{matrix.arch}}/${{env.DEVICE_ARCH}}/packages
-          ls -lah ${FIRMWARE}/targets/${{matrix.arch}}/${{env.DEVICE_ARCH}}/
-          curl -fsSL git.io/file-transfer | sh
-          ./transfer wet -s -p 16 --no-progress ${FIRMWARE}/targets/${{matrix.arch}}/${{env.DEVICE_ARCH}}/ 2>&1 | tee wetransfer.log
-          echo "::warning file=wetransfer.com::$(cat wetransfer.log | grep https)"
-          echo "::set-output name=url::$(cat wetransfer.log | grep https | cut -f3 -d" ")"
-
       - name: Sync firmware Upload FTP
         id: ftpfirmware
         if: env.UP_FTP =='true' && env.IS_CONFIG_CONF == 'true' && !cancelled()
@@ -345,6 +334,18 @@ jobs:
           server_dir: ${{matrix.work}}/targets/${{matrix.arch}}/${{env.DEVICE_ARCH}}
           options: " --parallel=8"
 
+      - name: Upload firmware to WeTransfer
+        id: wetransfer
+        if: env.UP_WETRANSFER =='true' && !cancelled()
+        run: |
+          rm -rf ${FIRMWARE}/targets/${{matrix.arch}}/${{env.DEVICE_ARCH}}/packages
+          ls -lah ${FIRMWARE}/targets/${{matrix.arch}}/${{env.DEVICE_ARCH}}/
+          curl -fsSL git.io/file-transfer | sh
+          ./transfer wet -s -p 16 --no-progress ${FIRMWARE}/targets/${{matrix.arch}}/${{env.DEVICE_ARCH}}/ 2>&1 | tee wetransfer.log
+          echo "::warning file=wetransfer.com::$(cat wetransfer.log | grep https)"
+          echo "::set-output name=url::$(cat wetransfer.log | grep https | cut -f3 -d" ")"
+
+
   Upload:
     name: Upload firmware 
     runs-on: ubuntu-latest
@@ -357,13 +358,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@main
+      - run: |
+          sudo mkdir -p /work/${{matrix.work}}
+          sudo chown $USER:$GROUPS /work/${{matrix.work}}
       #下载工作件
       - name: Download ${{matrix.work}} firmware Artifact
         uses: actions/download-artifact@v2
         id: download
         with:
           name: ${{matrix.work}}-${{matrix.arch}}-firmware
-          path: work/${{matrix.work}}
+          path: /work/${{matrix.work}}
       #删除工作件
       - name: Delete ${{matrix.work}} firmware Artifact
         uses: geekyeggo/delete-artifact@v1
@@ -373,6 +377,7 @@ jobs:
       - name: Files Show
         working-directory: "${{steps.download.outputs.download-path}}"
         run: |
+          cd work/bin
           ls -lah
           pwd
           echo "FIRMWARE=$PWD" >> $GITHUB_ENV
@@ -416,6 +421,7 @@ jobs:
           ssl_allow: true
           local_dir: ${{env.FIRMWARE}}
           server_dir: ${{matrix.work}}
+          debug: true
           options: " --parallel=8"
 
   Clean:
