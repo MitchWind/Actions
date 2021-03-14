@@ -305,7 +305,7 @@ jobs:
           path: |
             ${{matrix.work}}/${{matrix.arch}}/.config
             ${{env.FIRMWARE}}
-            !${{env.FIRMWARE}}/targets
+            !${{env.FIRMWARE}}/**/openwrt-x86-64-generic?.gz
 
       # - name: Sync firmware Qiniu Deploy
       #   if: env.UP_QINIU =='true' && env.IS_CONFIG_CONF == 'true' && !cancelled()
@@ -321,19 +321,6 @@ jobs:
       #     UPTOC_UPLOADER_AK: ${{ secrets.UPTOC_UPLOADER_AK }}
       #     UPTOC_UPLOADER_SK: ${{ secrets.UPTOC_UPLOADER_SK }}
 
-      - name: Sync firmware Upload FTP
-        id: ftpfirmware
-        if: env.UP_FTP =='true' && env.IS_CONFIG_CONF == 'true' && !cancelled()
-        uses: MitchWind/ftp-deploy@master
-        with:
-          server: ${{env.FTP_SERVER}}
-          username: ${{env.FTP_USERNAME}}
-          password: ${{ secrets.FTP_PASSWOD }}
-          ssl_allow: true
-          local_dir: ${{env.FIRMWARE}}/targets/${{matrix.arch}}/${{env.DEVICE_ARCH}}
-          server_dir: ${{matrix.work}}/targets/${{matrix.arch}}/${{env.DEVICE_ARCH}}
-          options: " --parallel=8"
-
       - name: Upload firmware to WeTransfer
         id: wetransfer
         if: env.UP_WETRANSFER =='true' && !cancelled()
@@ -344,6 +331,19 @@ jobs:
           ./transfer wet -s -p 16 --no-progress ${FIRMWARE}/targets/${{matrix.arch}}/${{env.DEVICE_ARCH}}/ 2>&1 | tee wetransfer.log
           echo "::warning file=wetransfer.com::$(cat wetransfer.log | grep https)"
           echo "::set-output name=url::$(cat wetransfer.log | grep https | cut -f3 -d" ")"
+      
+      - name: Sync firmware Upload FTP
+        id: ftpfirmware
+        if: env.UP_FTP =='true' && env.IS_CONFIG_CONF == 'true' && !cancelled()
+        uses: MitchWind/ftp-deploy@master
+        with:
+          server: ${{env.FTP_SERVER}}
+          username: ${{env.FTP_USERNAME}}
+          password: ${{ secrets.FTP_PASSWOD }}
+          ssl_allow: true
+          local_dir: ${{env.FIRMWARE}}/targets/${{matrix.arch}}/${{env.DEVICE_ARCH}}
+          server_dir: firmware/${{matrix.work}}
+          options: " --parallel=8"
 
 
   Upload:
@@ -428,7 +428,6 @@ jobs:
     name: Clean Jobs
     runs-on: ubuntu-latest
     needs: [Make,Upload]
-    if: ${{ !always() }}
     steps:
       - name: Delete workflow runs
         uses: Mattraks/delete-workflow-runs@main
