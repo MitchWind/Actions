@@ -99,7 +99,7 @@ jobs:
       - name: Copy ${{matrix.arch}} Feeds
         if: env.IS_Plugs_CONF == 'true'
         run: |
-          [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}} ] && cat ${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}} > work/feeds.conf.default
+          [ -e ${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}} ] && cat ${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}} >> work/feeds.conf.default
           ls -lah
           cd work/ && git status && ls -lah
     
