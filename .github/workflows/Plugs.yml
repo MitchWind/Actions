@@ -146,6 +146,12 @@ jobs:
         working-directory: ./work
         run: |
           echo "还没有想好怎么写"
+          while read line; do 
+            echo "Line No. $i : $line"
+          done < ${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}}
+
+
+
 
 
   Clean:
