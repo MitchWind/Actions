@@ -147,7 +147,8 @@ jobs:
         run: |
           echo "还没有想好怎么写"
           while read line; do 
-            echo "Line No. $i : $line"
+            plugname = $(echo "$line" | awk '{print $2}')
+            echo $plugname
           done < ${{matrix.work}}/${{matrix.arch}}/${{env.FEEDS_CONF}}
 
 
