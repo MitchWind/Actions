@@ -342,7 +342,7 @@ jobs:
           ssl_allow: true
           local_dir: ${{env.FIRMWARE}}/targets/${{matrix.arch}}/${{env.DEVICE_ARCH}}
           server_dir: firmware/${{matrix.work}}
-          debug: true
+          debug: false
           options: " --parallel=8"
 
 
@@ -422,7 +422,7 @@ jobs:
           ssl_allow: true
           local_dir: ${{env.FIRMWARE}}
           server_dir: ${{matrix.work}}
-          debug: true
+          debug: false
           options: " --parallel=8"
 
   Clean:
