@@ -5,4 +5,4 @@ src-git telephony https://git.openwrt.org/feed/telephony.git
 src-git freifunk https://github.com/freifunk/openwrt-packages.git
 
 
-src-git wind  https://github.com/streetwind/openwrt-package.git;master
+src-git wind  https://github.com/streetwind/openwrt-package.git
