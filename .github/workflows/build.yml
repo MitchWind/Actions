@@ -422,7 +422,7 @@ jobs:
           ssl_allow: true
           local_dir: ${{env.FIRMWARE}}
           server_dir: ${{matrix.work}}
-          debug: false
+          debug: true
           options: " --parallel=8"
 
   Clean:
