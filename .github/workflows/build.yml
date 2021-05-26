@@ -37,7 +37,7 @@ defaults:
 
 jobs:
   verify:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     name: File Verify ${{matrix.work}} ${{matrix.arch}}
     strategy:
       fail-fast: false
@@ -153,7 +153,7 @@ jobs:
           key: ${{matrix.work}}_${{matrix.arch}}_config
 
   Make:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     name: Make ${{matrix.work}} ${{matrix.arch}}
     needs: verify
     strategy:
@@ -348,7 +348,7 @@ jobs:
 
   Upload:
     name: Upload firmware 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     needs: Make
     if: ${{ always() }}
     strategy:
@@ -427,7 +427,7 @@ jobs:
 
   Clean:
     name: Clean Jobs
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     needs: [Make,Upload]
     if: ${{ always() }}
     steps:
