@@ -42,7 +42,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        work: [openwrt, lienol, lede]
+        work: [openwrt, lede]
         arch: [x86]
     outputs:
       isWork: '{"include":["openwrt":${{env.isopenwrt}},"lede":${{env.islede}},"lienol":${{env.islienol}}]}'
@@ -343,7 +343,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        work: [openwrt, lienol, lede]
+        work: [openwrt, lede]
         arch: [x86]
     steps:
       - name: Checkout
